@@ -1,26 +1,302 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* ─── Custom Theme ─────────────────────────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-crimson:          #DC143C;
+  --color-crimson-hover:    #FF1F4E;
+  --color-crimson-dim:      #9B1B30;
+
+  --color-bg-primary:       #080808;
+  --color-bg-paper:         #040404;
+  --color-bg-subtle:        #0D0D0D;
+  --color-bg-elevated:      #141414;
+  --color-bg-hover:         #1A1A1A;
+
+  --color-border:           #1E1E1E;
+  --color-border-subtle:    #141414;
+  --color-border-strong:    #2A2A2A;
+
+  --color-text-primary:     #EFEFEF;
+  --color-text-secondary:   #A1A1A1;
+  --color-text-muted:       #6B6B6B;
+  --color-text-faint:       #3F3F3F;
+
+  --color-terminal-green:   #4ADE80;
+  --color-terminal-amber:   #FBBF24;
+  --color-terminal-cyan:    #22D3EE;
+
+  --font-display: var(--font-big-shoulders);
+  --font-mono:    var(--font-jetbrains);
+  --font-body:    var(--font-inter);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── CSS Variables ─────────────────────────────────────────────────── */
+:root {
+  --crimson:    #DC143C;
+  --deep-rose:  #9B1B30;
+}
+
+/* ─── Base ──────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  position: relative;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #080808;
+  color: #EFEFEF;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Custom text selection */
+::selection      { background-color: rgba(220,20,60,0.25); color: #FFFFFF; }
+::-moz-selection { background-color: rgba(220,20,60,0.25); color: #FFFFFF; }
+
+/* ─── Scrollbar ─────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: #141414; }
+::-webkit-scrollbar-thumb { background: #DC143C; border-radius: 2px; }
+
+/* ─── Focus ─────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid rgba(220, 20, 60, 0.5);
+  outline-offset: 2px;
+}
+
+/* ─── Reduced Motion ────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════ */
+/* ─── Zeptaz Design System Utilities ──────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════ */
+
+/* ─── Terminal background (hero / 404 backdrop) ─────────────────────── */
+.terminal-bg {
+  background-color: #080808;
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px),
+    radial-gradient(ellipse 70% 45% at 50% 100%, rgba(220,20,60,0.08), transparent 65%);
+  background-size: 28px 28px, 100% 100%;
+}
+
+/* ─── Eyebrow tag (crimson square + mono caps) ──────────────────────── */
+.eyebrow-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono), 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6B6B6B;
+}
+.eyebrow-tag::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: #DC143C;
+  flex-shrink: 0;
+}
+
+/* ─── Bordered card ─────────────────────────────────────────────────── */
+.bordered-card {
+  border: 1px solid #1E1E1E;
+  background-color: #141414;
+  transition: border-color 200ms ease;
+}
+.bordered-card:hover {
+  border-color: #2A2A2A;
+}
+
+/* ─── Mono bullet list ──────────────────────────────────────────────── */
+.mono-bullet {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: #A1A1A1;
+}
+.mono-bullet::before {
+  content: '›';
+  color: #DC143C;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+/* ─── Terminal log line ─────────────────────────────────────────────── */
+.terminal-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.35);
+}
+
+/* ─── Display XL headline ───────────────────────────────────────────── */
+.display-xl {
+  font-family: var(--font-display), 'Big Shoulders', sans-serif;
+  font-weight: 900;
+  font-size: clamp(42px, 6.5vw, 96px);
+  letter-spacing: -0.01em;
+  line-height: 1.0;
+  text-transform: uppercase;
+}
+
+/* ─── Dot grid pattern ─────────────────────────────────────────────── */
+.dot-grid {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.dot-grid-dark {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* ─── Fine grid overlay ─────────────────────────────────────────────── */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.grid-bg-dark {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ─── Noise texture overlay ─────────────────────────────────────────── */
+.noise-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Gradient text ─────────────────────────────────────────────────── */
+.gradient-text {
+  background: linear-gradient(135deg, #DC143C 0%, #FF2D55 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ─── Pill CTA buttons ──────────────────────────────────────────────── */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.5rem;
+  border-radius: 0;
+  background-color: #DC143C;
+  color: white;
+  font-family: var(--font-display), sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: background-color 200ms ease;
+}
+.btn-primary:hover {
+  background-color: #FF1F4E;
+}
+.btn-primary:active { opacity: 0.9; }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.5rem;
+  border-radius: 0;
+  border: 1px solid #2A2A2A;
+  color: #EFEFEF;
+  font-family: var(--font-mono), monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: transparent;
+  transition: border-color 200ms ease, color 200ms ease;
+}
+.btn-outline:hover {
+  border-color: #DC143C;
+  color: #DC143C;
+}
+
+/* ─── Section divider line ──────────────────────────────────────────── */
+.section-line {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background-color: #1E1E1E;
+}
+
+/* ─── Crimson glow pulse ────────────────────────────────────────────── */
+@keyframes border-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220, 20, 60, 0); }
+  50%       { box-shadow: 0 0 20px 4px rgba(220, 20, 60, 0.12); }
+}
+.glow-pulse {
+  animation: border-glow 3s ease-in-out infinite;
+}
+
+/* ─── Marquee gradient mask (fade edges) ───────────────────────────── */
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8%, black 92%, transparent 100%);
+}
+
+/* ─── Terminal backdrop scroll animation ────────────────────────────── */
+@keyframes terminal-scroll {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+
+.terminal-pane {
+  animation: terminal-scroll var(--scroll-duration, 25s) linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .terminal-pane {
+    animation-play-state: paused;
+  }
+}
+
+/* ─── GSAP scroll animation initial states ──────────────────────────── */
+.gsap-fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.gsap-stagger-item {
+  opacity: 0;
+  transform: translateY(40px) scale(0.95);
+}
+
+.gsap-scale-up {
+  opacity: 0;
+  transform: scale(0.85);
 }
