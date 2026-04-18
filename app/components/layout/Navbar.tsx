@@ -83,21 +83,14 @@ export default function Navbar() {
             })}
           </div>
 
-          {/* Desktop right: LOGIN + GET ACCESS */}
+          {/* Desktop right: CONTACT US */}
           <div className="hidden md:flex items-center gap-2">
-            <button
-              onClick={() => scrollTo('#contact')}
-              className="px-4 py-[7px] border border-[#2A2A2A] text-[#EFEFEF] hover:border-[#DC143C] hover:text-[#DC143C] transition-all duration-200 text-[11px] uppercase tracking-[0.1em]"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
-              Login
-            </button>
             <button
               onClick={() => scrollTo('#contact')}
               className="px-4 py-[7px] bg-[#DC143C] text-white hover:bg-[#FF1F4E] transition-colors duration-200 text-[11px] uppercase tracking-[0.1em]"
               style={{ fontFamily: 'var(--font-mono)' }}
             >
-              Get Access
+              Contact Us
             </button>
           </div>
 
@@ -152,7 +145,7 @@ export default function Navbar() {
                   className="w-full py-3 bg-[#DC143C] text-white text-[13px] font-bold uppercase tracking-[0.05em] hover:bg-[#FF1F4E] transition-colors duration-200"
                   style={{ fontFamily: 'var(--font-display)' }}
                 >
-                  Get Access
+                  Contact Us
                 </button>
               </motion.div>
             </motion.nav>
