@@ -40,11 +40,13 @@ export const metadata: Metadata = {
       'Deploy specialized AI agents that automate your workflows and scale your business 24/7.',
     type: 'website',
     siteName: 'Zeptaz',
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Zeptaz' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Zeptaz — AI-Powered Digital Workforce',
     description: 'Deploy specialized AI agents that automate your workflows and scale your business 24/7.',
+    images: ['/og-image.png'],
   },
 };
 

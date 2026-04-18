@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
+import Image from 'next/image';
 import { NAV_LINKS } from '@/lib/constants';
 import { useScrollSection } from '@/hooks/useScrollSection';
 import { cn } from '@/lib/utils';
@@ -41,18 +42,19 @@ export default function Navbar() {
       >
         <div className="max-w-6xl mx-auto h-full px-5 flex items-center justify-between">
 
-          {/* Logo wordmark */}
+          {/* Logo */}
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="flex items-center gap-2 group"
             aria-label="Zeptaz home"
           >
-            <span
-              className="text-[18px] font-bold text-[#EFEFEF] tracking-tight"
-              style={{ fontFamily: 'var(--font-display)' }}
-            >
-              Zeptaz
-            </span>
+            <Image
+              src="/zeptaz-icon.svg"
+              alt="Zeptaz icon"
+              width={36}
+              height={36}
+              className="invert"
+            />
           </button>
 
           {/* Desktop nav links */}
