@@ -1,34 +1,57 @@
 'use client';
-import { useState, FormEvent, useRef } from 'react';
+import { useState, FormEvent } from 'react';
+import emailjs from '@emailjs/browser';
 import { Send, CheckCircle } from 'lucide-react';
 import { motion, useAnimate, stagger } from 'framer-motion';
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({ name: '', email: '', company: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('Something went wrong. Please try again or email us directly.');
   const [scope, animate] = useAnimate();
-  const successRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setStatus('loading');
+    setErrorMessage('Something went wrong. Please try again or email us directly.');
+
+    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+    const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+
+    if (!serviceId || !templateId || !publicKey) {
+      setErrorMessage('Form is not configured yet. Please email us directly.');
+      setStatus('error');
+      return;
+    }
+
     try {
-      const response = await fetch('https://formspree.io/f/xkgjekvl', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, _replyto: formData.email })
-      });
-      if (response.ok) {
-        await animate('.form-field', { opacity: 0, y: -8 }, { duration: 0.2, delay: stagger(0.04) });
-        setStatus('success');
-        setFormData({ name: '', email: '', company: '', message: '' });
-        animate('.success-icon', { scale: [0, 1.15, 1], opacity: [0, 1, 1] }, { times: [0, 0.7, 1], duration: 0.4, delay: 0.1 });
-      } else {
-        setStatus('error');
-      }
+      await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          name: formData.name,
+          email: formData.email,
+          company: formData.company || 'Not provided',
+          message: formData.message,
+          submitted_at: new Date().toISOString(),
+        },
+        { publicKey }
+      );
     } catch {
       setStatus('error');
+      setErrorMessage('Something went wrong. Please try again or email us directly.');
+      return;
     }
+
+    try {
+      await animate('.form-field', { opacity: 0, y: -8 }, { duration: 0.2, delay: stagger(0.04) });
+    } catch {
+      // Ignore animation failures after a successful send so the success state still renders.
+    }
+
+    setFormData({ name: '', email: '', company: '', message: '' });
+    setStatus('success');
   };
 
   const focusRing = {
@@ -45,6 +68,8 @@ export default function ContactForm() {
         <motion.div
           className="success-icon w-14 h-14 flex items-center justify-center bg-[rgba(220,20,60,0.08)] border border-[rgba(220,20,60,0.2)]"
           initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: [0, 1.15, 1], opacity: [0, 1, 1] }}
+          transition={{ times: [0, 0.7, 1], duration: 0.4, delay: 0.1 }}
         >
           <CheckCircle className="w-7 h-7 text-[#DC143C]" />
         </motion.div>
@@ -123,7 +148,7 @@ export default function ContactForm() {
 
       {status === 'error' && (
         <p className="form-field text-[#DC143C] text-[13px]" style={{ fontFamily: 'var(--font-mono)' }}>
-          Something went wrong. Please try again or email us directly.
+          {errorMessage}
         </p>
       )}
 
