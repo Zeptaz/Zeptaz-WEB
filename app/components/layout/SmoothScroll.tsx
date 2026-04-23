@@ -30,6 +30,15 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     // Refresh after fonts settle
     ScrollTrigger.refresh();
 
+    // Handle direct hash navigation (e.g. zeptaz.com/#contact)
+    // Lenis overrides native browser hash scrolling on Windows, so we re-apply it.
+    const hash = window.location.hash;
+    if (hash) {
+      setTimeout(() => {
+        lenis.scrollTo(hash, { immediate: false });
+      }, 300);
+    }
+
     return () => {
       gsap.ticker.remove(tickerFn);
       lenis.destroy();
