@@ -107,16 +107,7 @@ function PhotoCard({
       onMouseEnter={() => onHover(member.id)}
       onMouseLeave={() => onHover(null)}
     >
-      <img
-        src={member.image}
-        alt={member.name}
-        className="w-full h-full object-cover transition-[filter] duration-500"
-        style={{
-          filter: isActive
-            ? 'grayscale(0) brightness(1)'
-            : 'grayscale(1) brightness(0.6)',
-        }}
-      />
+      <div className="w-full h-full bg-[#111111]" />
     </div>
   );
 }
