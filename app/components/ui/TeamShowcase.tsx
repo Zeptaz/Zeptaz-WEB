@@ -44,7 +44,7 @@ export default function TeamShowcase() {
   return (
     <div className="flex flex-col md:flex-row items-start gap-10 lg:gap-16 select-none w-full">
       {/* Left: staggered photo grid */}
-      <div className="flex gap-3 flex-shrink-0 overflow-x-auto pb-1 md:pb-0">
+      <div className="hidden flex gap-3 flex-shrink-0 overflow-x-auto pb-1 md:pb-0">
         <div className="flex flex-col gap-3">
           {col1.map(m => (
             <PhotoCard key={m.id} member={m} hoveredId={hoveredId} onHover={setHoveredId}
