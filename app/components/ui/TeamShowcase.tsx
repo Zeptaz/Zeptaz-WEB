@@ -166,13 +166,6 @@ function MemberRow({
               <LinkedinIcon size={11} />
             </a>
           )}
-          {member.social?.github && (
-            <a href={member.social.github} target="_blank" rel="noopener noreferrer"
-              onClick={e => e.stopPropagation()}
-              className="p-1 text-[#6B6B6B] hover:text-white transition-colors duration-150" title="GitHub">
-              <GithubIcon size={11} />
-            </a>
-          )}
           {member.social?.instagram && (
             <a href={member.social.instagram} target="_blank" rel="noopener noreferrer"
               onClick={e => e.stopPropagation()}
