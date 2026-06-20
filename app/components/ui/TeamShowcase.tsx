@@ -100,7 +100,7 @@ function PhotoCard({
   return (
     <div
       className={cn(
-        'overflow-hidden cursor-pointer flex-shrink-0 transition-opacity duration-300 border border-[#1E1E1E]',
+        'overflow-hidden cursor-pointer flex-shrink-0 transition-opacity duration-300',
         className,
         isDimmed ? 'opacity-40' : 'opacity-100',
       )}
