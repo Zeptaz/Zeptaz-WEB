@@ -107,7 +107,7 @@ export const TEAM_MEMBERS = [
     focus: 'Strategy, client relationships, business development',
     initials: 'TB',
     image: '/team/Tevin.png',
-    social: { linkedin: '#', instagram: '#' },
+    social: { linkedin: 'https://www.linkedin.com/in/tevin-bandara-95a555390/', instagram: 'https://www.instagram.com/0_tevin_0/' },
   },
   {
     id: 'sasindu',
@@ -116,7 +116,7 @@ export const TEAM_MEMBERS = [
     focus: 'Product design, user experience, brand direction',
     initials: 'SS',
     image: '/team/Sasindu.png',
-    social: { linkedin: '#', instagram: '#' },
+    social: { linkedin: 'https://www.linkedin.com/in/sasindu-rashmith-9862a5394/', instagram: 'https://www.instagram.com/sasindu_rashmith/' },
   },
   {
     id: 'naveen',
@@ -125,7 +125,7 @@ export const TEAM_MEMBERS = [
     focus: 'Operations, workflow design, agent deployment',
     initials: 'NH',
     image: '/team/Harry.png',
-    social: { linkedin: '#', instagram: '#' },
+    social: { linkedin: 'https://www.linkedin.com/in/naveen-harry-082829359/', instagram: 'https://www.instagram.com/_harry.827_/' },
   },
   {
     id: 'jayith',
@@ -134,7 +134,7 @@ export const TEAM_MEMBERS = [
     focus: 'Technical architecture, AI engineering, integrations',
     initials: 'JW',
     image: '/team/Jayith.png',
-    social: { linkedin: '#', github: '#' },
+    social: { linkedin: 'https://www.linkedin.com/in/jayith-wijethunge/', instagram: 'https://www.instagram.com/jayithw/' },
   },
 ];
 
