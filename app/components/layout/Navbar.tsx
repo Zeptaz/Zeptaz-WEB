@@ -1,159 +1,146 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
-import Image from 'next/image';
 import { NAV_LINKS } from '@/lib/constants';
-import { useScrollSection } from '@/hooks/useScrollSection';
 import { cn } from '@/lib/utils';
-import { centerStagger, nivoraStaggerItem } from '@/lib/animations';
-
-const sectionIds = NAV_LINKS.map(l => l.href.slice(1));
+import { gsap } from '@/lib/gsap';
+import LogoMark from '@/components/ui/LogoMark';
+import DecryptedText from '@/components/ui/DecryptedText';
 
 export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const activeSection = useScrollSection(sectionIds);
+  const pathname = usePathname();
+  const isHome = pathname === '/';
+  // On home the navbar stays hidden until the visitor scrolls past the hero;
+  // on every other page it's visible immediately.
+  const [revealed, setRevealed] = useState(false);
+  const [tone, setTone] = useState<'dark' | 'light'>('dark');
+  const [open, setOpen] = useState(false);
+  const drawerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 24);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    setOpen(false);
+    const baseline = 28;
+    const update = () => {
+      setRevealed(!isHome || window.scrollY > 4);
+      const els = document.querySelectorAll<HTMLElement>('section[data-nav]');
+      let current: 'dark' | 'light' = 'dark';
+      for (const el of els) {
+        const r = el.getBoundingClientRect();
+        if (r.top <= baseline && r.bottom > baseline) {
+          current = el.dataset.nav === 'light' ? 'light' : 'dark';
+          break;
+        }
+      }
+      setTone(current);
+    };
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    return () => {
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, [isHome, pathname]);
 
-  const scrollTo = (href: string) => {
-    const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-    setMobileOpen(false);
-  };
+  // animate drawer
+  useEffect(() => {
+    const el = drawerRef.current;
+    if (!el) return;
+    if (open) {
+      gsap.fromTo(el, { height: 0, opacity: 0 }, { height: 'auto', opacity: 1, duration: 0.4, ease: 'power3.out' });
+      const items = el.querySelectorAll('[data-drawer-item]');
+      gsap.fromTo(items, { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, stagger: 0.05, ease: 'power3.out', delay: 0.08 });
+    }
+  }, [open]);
+
+  const light = tone === 'light' && !open;
+  const ink = light ? '#0C0C0C' : '#EFEFEF';
 
   return (
-    <>
-      <motion.nav
-        initial={{ y: -56, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className={cn(
-          'fixed top-0 left-0 right-0 z-50 h-16 transition-all duration-300 bg-[#080808] border-b',
-          scrolled ? 'border-[#1E1E1E]' : 'border-transparent'
-        )}
-        role="navigation"
-        aria-label="Main navigation"
-      >
-        <div className="max-w-6xl mx-auto h-full px-5 flex items-center justify-between">
-
-          {/* Logo */}
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="flex items-center gap-2 group"
-            aria-label="Zeptaz home"
+    <header
+      className={cn(
+        'fixed top-0 inset-x-0 z-50 transition-[transform,opacity] duration-500',
+        revealed ? 'translate-y-0 opacity-100' : 'pointer-events-none -translate-y-full opacity-0',
+      )}
+    >
+      <div className="relative mx-auto flex h-16 max-w-[1240px] items-center justify-between px-5 sm:px-8">
+        {/* Left: logo badge, wordmark on hover */}
+        <Link href="/" className="group flex items-center gap-2.5 outline-none" aria-label="Zeptaz home" style={{ color: ink }}>
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center bg-crimson transition-transform duration-300 group-hover:-translate-x-0.5">
+            <LogoMark className="h-9 w-9 text-white" />
+          </span>
+          <span
+            className="max-w-0 -translate-x-1 overflow-hidden whitespace-nowrap font-display text-[19px] font-extrabold uppercase leading-none tracking-[0.16em] opacity-0 transition-all duration-300 group-hover:max-w-[140px] group-hover:translate-x-0 group-hover:opacity-100"
+            style={{ color: ink }}
           >
-            <Image
-              src="/zeptaz-icon.svg"
-              alt="Zeptaz icon"
-              width={36}
-              height={36}
-              className="invert"
-            />
-          </button>
+            Zeptaz
+          </span>
+        </Link>
 
-          {/* Desktop nav links */}
-          <div className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map(link => {
-              const isActive = activeSection === link.href.slice(1);
-              return (
-                <button
-                  key={link.href}
-                  onClick={() => scrollTo(link.href)}
-                  className={cn(
-                    'px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.08em] transition-colors duration-150 relative',
-                    'hover:text-white',
-                    isActive ? 'text-[#DC143C]' : 'text-[#A1A1A1]'
-                  )}
-                  style={{ fontFamily: 'var(--font-mono)' }}
-                >
-                  {link.label}
-                  {isActive && (
-                    <motion.div
-                      layoutId="nav-underline"
-                      className="absolute bottom-0 left-3.5 right-3.5 h-[1px] bg-[#DC143C]"
-                      transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </div>
+        {/* Center: floating nav pill */}
+        <nav
+          className={cn(
+            'absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 border px-2 py-1.5 backdrop-blur-md md:flex',
+            light ? 'border-ink-border-strong bg-paper-2/80' : 'border-border-strong bg-bg-elevated/70',
+          )}
+        >
+          {NAV_LINKS.map((l) => {
+            const activeLink = pathname === l.href;
+            return (
+              <Link key={l.href} href={l.href} className="group flex items-center gap-2 px-3.5 py-2">
+                <span className={cn('h-2.5 w-2.5 shrink-0 bg-crimson transition-transform duration-200 group-hover:scale-110', activeLink && 'scale-110')} />
+                <DecryptedText
+                  text={l.label}
+                  animateOn="hover"
+                  className="font-mono text-[11px] uppercase tracking-[0.14em]"
+                  encryptedClassName="font-mono text-[11px] uppercase tracking-[0.14em] text-crimson"
+                  parentClassName={cn('font-mono text-[11px] uppercase tracking-[0.14em] transition-opacity group-hover:opacity-100', activeLink ? 'opacity-100' : 'opacity-80')}
+                  style={{ color: activeLink ? '#DC143C' : ink }}
+                />
+              </Link>
+            );
+          })}
+        </nav>
 
-          {/* Desktop right: CONTACT US */}
-          <div className="hidden md:flex items-center gap-2">
-            <button
-              onClick={() => scrollTo('#contact')}
-              className="px-4 py-[7px] bg-[#DC143C] text-white hover:bg-[#FF1F4E] transition-colors duration-200 text-[11px] uppercase tracking-[0.1em]"
-              style={{ fontFamily: 'var(--font-mono)' }}
-            >
-              Contact Us
-            </button>
-          </div>
-
-          {/* Mobile hamburger */}
-          <button
-            className="md:hidden text-[#A1A1A1] p-1.5 hover:text-white transition-colors"
-            onClick={() => setMobileOpen(v => !v)}
-            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={mobileOpen}
-          >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+        {/* Right: CTA */}
+        <div className="hidden md:block">
+          <Link href="/contact" className="btn btn-primary !px-4 !py-2.5 text-[10px]">Book a call</Link>
         </div>
-      </motion.nav>
+
+        {/* Mobile toggle */}
+        <button
+          className="p-1.5 md:hidden"
+          onClick={() => setOpen((v) => !v)}
+          aria-label={open ? 'Close menu' : 'Open menu'}
+          aria-expanded={open}
+          style={{ color: open ? '#EFEFEF' : ink }}
+        >
+          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+      </div>
 
       {/* Mobile drawer */}
-      <AnimatePresence mode="popLayout">
-        {mobileOpen && (
-          <motion.div
-            key="mobile-drawer"
-            initial={{ opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -6 }}
-            transition={{ duration: 0.17, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="fixed top-16 left-0 right-0 z-40 bg-[#080808] border-b border-[#1E1E1E]"
-          >
-            <motion.nav
-              className="max-w-6xl mx-auto px-5 py-5 flex flex-col gap-0.5"
-              variants={centerStagger}
-              initial="hidden"
-              animate="visible"
+      <div ref={drawerRef} className={cn('md:hidden overflow-hidden', !open && 'hidden')}>
+        <nav className="flex flex-col gap-1 border-t border-border bg-bg-primary px-5 py-5">
+          {NAV_LINKS.map((l) => (
+            <Link
+              key={l.href}
+              data-drawer-item
+              href={l.href}
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2.5 py-2.5 text-left font-mono text-[13px] uppercase tracking-[0.1em] text-text-secondary hover:text-white"
             >
-              {NAV_LINKS.map(link => (
-                <motion.button
-                  key={link.href}
-                  variants={nivoraStaggerItem}
-                  onClick={() => scrollTo(link.href)}
-                  className={cn(
-                    'text-left py-2.5 px-3 text-[13px] uppercase tracking-[0.08em] font-medium transition-colors duration-150',
-                    activeSection === link.href.slice(1)
-                      ? 'text-[#DC143C]'
-                      : 'text-[#A1A1A1] hover:text-white'
-                  )}
-                  style={{ fontFamily: 'var(--font-mono)' }}
-                >
-                  {link.label}
-                </motion.button>
-              ))}
-              <motion.div variants={nivoraStaggerItem} className="mt-3 pt-3 border-t border-[#1E1E1E] space-y-2">
-                <button
-                  onClick={() => scrollTo('#contact')}
-                  className="w-full py-3 bg-[#DC143C] text-white text-[13px] font-bold uppercase tracking-[0.05em] hover:bg-[#FF1F4E] transition-colors duration-200"
-                  style={{ fontFamily: 'var(--font-display)' }}
-                >
-                  Contact Us
-                </button>
-              </motion.div>
-            </motion.nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+              <span className="h-2.5 w-2.5 bg-crimson" />
+              {l.label}
+            </Link>
+          ))}
+          <Link data-drawer-item href="/contact" onClick={() => setOpen(false)} className="btn btn-primary mt-3 w-full">
+            Book a call
+          </Link>
+        </nav>
+      </div>
+    </header>
   );
 }

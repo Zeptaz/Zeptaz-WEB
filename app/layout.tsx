@@ -1,51 +1,41 @@
 import type { Metadata } from 'next';
-import { Big_Shoulders, Inter, JetBrains_Mono } from 'next/font/google';
+import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
-import SmoothScroll from '@/components/layout/SmoothScroll';
-import ScrollProgress from '@/components/ui/ScrollProgress';
 
-const bigShoulders = Big_Shoulders({
+// Geist (variable) - futuristic, highly readable. One cohesive system:
+// sans drives both display + body, mono drives the terminal/labels.
+const geistSans = Geist({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800', '900'],
-  variable: '--font-big-shoulders',
-  display: 'swap',
-  adjustFontFallback: false,
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-jetbrains',
+  variable: '--font-geist-sans',
   display: 'swap',
 });
 
-const inter = Inter({
+const geistMono = Geist_Mono({
   subsets: ['latin'],
-  weight: ['400', '500', '700'],
-  variable: '--font-inter',
+  variable: '--font-geist-mono',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'Zeptaz — AI-Powered Digital Workforce',
+  title: 'Zeptaz - AI Workflow Automation for Service Businesses',
   description:
-    'Zeptaz deploys specialized AI agents that automate your workflows, qualify your leads, predict your outcomes, and scale your operations 24/7.',
-  keywords: ['AI automation', 'AI agents', 'business automation', 'workflow automation', 'Sri Lanka'],
+    'Zeptaz builds reliable AI workflow automation systems that connect your forms, inboxes, CRM/ATS, alerts, AI-assisted drafts, follow-ups, and reporting - so important work never gets stuck between tools.',
+  keywords: [
+    'AI workflow automation', 'recruitment workflow automation', 'CRM automation',
+    'ATS automation', 'service business automation', 'sales workflow automation',
+  ],
   authors: [{ name: 'Zeptaz' }],
   openGraph: {
-    title: 'Zeptaz — AI-Powered Digital Workforce',
-    description:
-      'Deploy specialized AI agents that automate your workflows and scale your business 24/7.',
+    title: 'Zeptaz - AI Workflow Automation for Service Businesses',
+    description: 'Reliable workflow systems, not one-off zaps. AI assists inside a controlled, human-approved workflow.',
     type: 'website',
     siteName: 'Zeptaz',
-    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Zeptaz' }],
+    images: ['/og-image.png'],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Zeptaz — AI-Powered Digital Workforce',
-    description: 'Deploy specialized AI agents that automate your workflows and scale your business 24/7.',
+    title: 'Zeptaz - AI Workflow Automation for Service Businesses',
+    description: 'Reliable workflow systems, not one-off zaps. AI assists inside a controlled, human-approved workflow.',
     images: ['/og-image.png'],
   },
 };
@@ -54,18 +44,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${bigShoulders.variable} ${jetbrainsMono.variable} ${inter.variable}`}
+      className={`${geistSans.variable} ${geistMono.variable}`}
       style={{ colorScheme: 'dark' }}
       suppressHydrationWarning
     >
-      <body className="bg-[#080808] text-[#EFEFEF] min-h-screen">
-        <SmoothScroll>
-          <ScrollProgress />
-          <Navbar />
-          <main className="relative z-10">{children}</main>
-          <Footer />
-        </SmoothScroll>
-      </body>
+      <body className="bg-bg-primary text-text-primary antialiased">{children}</body>
     </html>
   );
 }

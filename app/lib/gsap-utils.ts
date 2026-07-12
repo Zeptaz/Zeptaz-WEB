@@ -1,12 +1,7 @@
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+'use client';
+import { gsap, ScrollTrigger, prefersReducedMotion } from './gsap';
 
-gsap.registerPlugin(ScrollTrigger);
-
-export function prefersReducedMotion(): boolean {
-  if (typeof window === 'undefined') return false;
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
+export { prefersReducedMotion };
 
 interface FadeUpOpts {
   y?: number;
@@ -14,7 +9,6 @@ interface FadeUpOpts {
   delay?: number;
   ease?: string;
   start?: string;
-  end?: string;
   scrub?: boolean | number;
   once?: boolean;
 }
@@ -25,25 +19,13 @@ export function createScrollFadeUp(
   opts: FadeUpOpts = {}
 ) {
   if (!element || !trigger) return null;
-
-  const {
-    y = 40,
-    duration = 0.7,
-    delay = 0,
-    ease = 'power2.out',
-    start = 'top 85%',
-    end = 'bottom 20%',
-    scrub = false,
-    once = true,
-  } = opts;
+  const { y = 40, duration = 0.8, delay = 0, ease = 'power3.out', start = 'top 85%', scrub = false, once = true } = opts;
 
   if (prefersReducedMotion()) {
     gsap.set(element, { opacity: 1, y: 0 });
     return null;
   }
-
   gsap.set(element, { opacity: 0, y });
-
   return gsap.to(element, {
     opacity: 1,
     y: 0,
@@ -53,7 +35,6 @@ export function createScrollFadeUp(
     scrollTrigger: {
       trigger: trigger as Element,
       start,
-      end,
       scrub: scrub || false,
       toggleActions: once ? 'play none none none' : 'play none none reset',
     },
@@ -77,23 +58,13 @@ export function createStaggerReveal(
   if (!elements || !trigger) return null;
   const els = Array.from(elements);
   if (els.length === 0) return null;
-
-  const {
-    y = 40,
-    scale = 0.96,
-    duration = 0.6,
-    stagger = 0.08,
-    ease = 'power2.out',
-    start = 'top 80%',
-  } = opts;
+  const { y = 38, scale = 1, duration = 0.7, stagger = 0.08, ease = 'power3.out', start = 'top 82%' } = opts;
 
   if (prefersReducedMotion()) {
     gsap.set(els, { opacity: 1, y: 0, scale: 1 });
     return null;
   }
-
   gsap.set(els, { opacity: 0, y, scale });
-
   return gsap.to(els, {
     opacity: 1,
     y: 0,
@@ -101,88 +72,89 @@ export function createStaggerReveal(
     duration,
     ease,
     stagger,
-    scrollTrigger: {
-      trigger: trigger as Element,
-      start,
-      toggleActions: 'play none none none',
-    },
+    scrollTrigger: { trigger: trigger as Element, start, toggleActions: 'play none none none' },
   });
 }
 
 interface ParallaxOpts {
-  speed?: number;
+  yPercent?: number;
   start?: string;
   end?: string;
 }
 
-export function createParallax(
-  element: Element | null,
-  trigger: Element | string | null,
-  opts: ParallaxOpts = {}
-) {
+export function createParallax(element: Element | null, trigger: Element | string | null, opts: ParallaxOpts = {}) {
   if (!element || !trigger || prefersReducedMotion()) return null;
-
-  const { speed = 0.4, start = 'top top', end = 'bottom top' } = opts;
-
+  const { yPercent = -18, start = 'top bottom', end = 'bottom top' } = opts;
   return gsap.to(element, {
-    yPercent: -30 * speed,
+    yPercent,
     ease: 'none',
-    scrollTrigger: {
-      trigger: trigger as Element,
-      start,
-      end,
-      scrub: true,
-    },
+    scrollTrigger: { trigger: trigger as Element, start, end, scrub: true },
   });
 }
 
-export function splitTextIntoSpans(
-  container: Element | null,
-  splitBy: 'word' | 'char' = 'word'
-): HTMLSpanElement[] {
+/**
+ * Draw an SVG <path> (or any stroked element) as the user scrolls through a trigger.
+ * Uses stroke-dasharray/offset - no premium DrawSVGPlugin needed.
+ */
+export function createScrollDraw(
+  path: SVGPathElement | SVGGeometryElement | null,
+  trigger: Element | string | null,
+  opts: { start?: string; end?: string; scrub?: boolean | number } = {}
+) {
+  if (!path || !trigger) return null;
+  const len = path.getTotalLength();
+  const { start = 'top 75%', end = 'bottom 60%', scrub = 1 } = opts;
+
+  if (prefersReducedMotion()) {
+    gsap.set(path, { strokeDasharray: 'none', strokeDashoffset: 0 });
+    return null;
+  }
+  gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
+  return gsap.to(path, {
+    strokeDashoffset: 0,
+    ease: 'none',
+    scrollTrigger: { trigger: trigger as Element, start, end, scrub },
+  });
+}
+
+/** Split a text node container into word/char spans (preserves colored child spans). */
+export function splitText(container: Element | null, by: 'word' | 'char' = 'word'): HTMLSpanElement[] {
   if (!container) return [];
-
-  // Collect all text content preserving structure
-  const text = container.textContent ?? '';
-  const units = splitBy === 'char' ? text.split('') : text.split(' ');
   const spans: HTMLSpanElement[] = [];
-
-  // Preserve any existing child elements (like crimson <span>s)
-  // by walking child nodes
   const childNodes = Array.from(container.childNodes);
   container.innerHTML = '';
 
+  const pushTokens = (text: string, color?: string, className?: string) => {
+    const tokens = by === 'char' ? text.split('') : text.split(' ');
+    tokens.forEach((token, i) => {
+      if (!token && by === 'word') return;
+      const outer = document.createElement('span');
+      outer.style.display = 'inline-block';
+      outer.style.overflow = 'hidden';
+      outer.style.verticalAlign = 'top';
+      const inner = document.createElement('span');
+      inner.textContent = token === '' ? ' ' : token;
+      inner.style.display = 'inline-block';
+      if (color) inner.style.color = color;
+      if (className) inner.className = className;
+      outer.appendChild(inner);
+      container.appendChild(outer);
+      if (by === 'word' && i < tokens.length - 1) {
+        container.appendChild(document.createTextNode(' '));
+      }
+      spans.push(inner);
+    });
+  };
+
   childNodes.forEach((node) => {
     if (node.nodeType === Node.TEXT_NODE) {
-      const content = node.textContent ?? '';
-      const tokens = splitBy === 'char' ? content.split('') : content.split(' ');
-      tokens.forEach((token, i) => {
-        if (!token && splitBy === 'word') return;
-        const span = document.createElement('span');
-        span.textContent = splitBy === 'word' ? token : token;
-        span.style.display = 'inline-block';
-        if (splitBy === 'word' && i < tokens.length - 1) span.style.marginRight = '0.25em';
-        container.appendChild(span);
-        spans.push(span);
-      });
+      pushTokens(node.textContent ?? '');
     } else if (node.nodeType === Node.ELEMENT_NODE) {
-      // Keep element nodes (colored spans etc.) and split their text
-      const el = node as Element;
-      const inner = el.textContent ?? '';
-      const tokens = splitBy === 'char' ? inner.split('') : inner.split(' ');
-      tokens.forEach((token, i) => {
-        if (!token && splitBy === 'word') return;
-        const span = document.createElement('span');
-        span.textContent = token;
-        span.style.display = 'inline-block';
-        span.style.color = (el as HTMLElement).style.color || 'inherit';
-        span.className = el.className;
-        if (splitBy === 'word' && i < tokens.length - 1) span.style.marginRight = '0.25em';
-        container.appendChild(span);
-        spans.push(span);
-      });
+      const el = node as HTMLElement;
+      pushTokens(el.textContent ?? '', el.style.color || undefined, el.className || undefined);
     }
   });
-
   return spans;
 }
+
+export { gsap, ScrollTrigger };
