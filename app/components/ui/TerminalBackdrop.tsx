@@ -1,98 +1,87 @@
 'use client';
 
-const agentLogs = [
-  '[12:04:21] AGENT.support     → handling ticket #4821',
-  '[12:04:22] AGENT.leadgen     ✓ qualified lead #9314',
-  '[12:04:23] AGENT.predict     → forecast updated',
-  '[12:04:24] AGENT.outreach    ✓ email sequence triggered',
-  '[12:04:25] AGENT.social      → post scheduled #7102',
-  '[12:04:26] AGENT.sales       ✓ pipeline updated',
-  '[12:04:27] AGENT.hr          → candidate screened',
-  '[12:04:28] AGENT.finance     ✓ report generated',
-  '[12:04:29] AGENT.support     → escalating ticket #4822',
-  '[12:04:30] AGENT.leadgen     → scoring 847 prospects',
-  '[12:04:31] AGENT.predict     ✓ model retrained',
-  '[12:04:32] AGENT.outreach    → A/B test variant selected',
-  '[12:04:33] AGENT.social      ✓ engagement report ready',
-  '[12:04:34] AGENT.sales       → deal stage advanced',
-  '[12:04:35] AGENT.finance     → invoice reconciled',
+/* Hero backdrop - reused & refined from V1: dot grid + crimson glow +
+   scrolling workflow logs (re-themed to the new positioning). */
+
+const intakeLogs = [
+  '[09:12:04] intake.form        → new candidate inquiry #C-2841',
+  '[09:12:05] record.ats         ✓ created BH-58120',
+  '[09:12:05] field.check        ✓ required fields present',
+  '[09:12:06] categorize         → "candidate · permanent"',
+  '[09:12:07] owner.assign       → routed to recruiter:dani',
+  '[09:12:07] alert.slack        ✓ #intake notified',
+  '[09:12:09] draft.ai           ⧖ awaiting human approval',
+  '[09:12:11] followup.task      ✓ scheduled +1d',
+  '[09:12:14] intake.email       → client job order #J-7740',
+  '[09:12:15] record.crm         ✓ updated HS-44021',
+  '[09:12:16] owner.assign       → routed to team:accounts',
+  '[09:12:18] stale.scan         → 0 inquiries past SLA',
+  '[09:12:21] handoff            ✓ placement → onboarding',
+  '[09:12:23] report.daily       ✓ snapshot written',
+  '[09:12:25] intake.form        → new candidate inquiry #C-2842',
 ];
 
-const deployLogs = [
-  '$ zeptaz deploy --agent=leadgen --region=ap-south',
-  '  ✓ container built  [2.1s]',
-  '  ✓ healthcheck pass [latency: 8ms]',
-  '  ✓ routing updated',
-  '$ zeptaz deploy --agent=support --replicas=3',
-  '  ✓ rolling update complete',
-  '$ zeptaz status --all',
-  '  leadgen   RUNNING  3/3 replicas',
-  '  support   RUNNING  3/3 replicas',
-  '  sales     RUNNING  2/2 replicas',
-  '  predict   RUNNING  1/1 replicas',
-  '$ zeptaz logs --agent=outreach --tail=20',
-  '  [OK] smtp relay connected',
-  '  [OK] template rendered: welcome_v3',
-  '$ zeptaz scale --agent=hr --replicas=2',
+const ruleLogs = [
+  '$ zeptaz engine --workflow=recruitment-intake',
+  '  ✓ connector: bullhorn  [oauth ok]',
+  '  ✓ connector: slack     [ok]',
+  '  ✓ rules: routing + ownership loaded',
+  '  ✓ fields: 7 required mapped',
+  '$ zeptaz rules verify',
+  '  owner.fallback        = team:desk',
+  '  stale.threshold       = 36h',
+  '  ai.autosend           = false',
+  '  ai.approval.required  = true',
+  '$ zeptaz status',
+  '  intake   HEALTHY   queue: 0',
+  '  drafts   HEALTHY   pending-approval: 2',
+  '  followup HEALTHY   due-today: 14',
+  '  reports  HEALTHY   last: 4m ago',
 ];
 
 const statusLogs = [
-  '[STATUS] sales:     pipeline synced  | 214 contacts',
-  '[STATUS] leadgen:   847 leads scored | 99.2% accuracy',
-  '[STATUS] support:   q_depth: 12      | avg_ttfr: 1.4s',
-  '[STATUS] predict:   model v4.2 live  | drift: 0.002',
-  '[STATUS] outreach:  seq_open: 68.4%  | 3,201 sent',
-  '[STATUS] social:    reach: 24.8k     | eng: 5.3%',
-  '[STATUS] finance:   rec_match: 100%  | lag: 0s',
-  '[STATUS] hr:        pipeline: 8 open | screening: 3',
-  '[WARN]   leadgen:   rate limit → backing off 2s',
-  '[STATUS] sales:     3 deals closed   | rev: $14,200',
-  '[STATUS] predict:   confidence: 0.94 | p95: 12ms',
-  '[OK]     support:   ticket #4821 resolved in 43s',
-  '[STATUS] outreach:  bounce_rate: 0.8%',
-  '[STATUS] social:    trending topic detected',
-  '[OK]     finance:   month-end close complete',
+  '[STATUS] intake:    inquiries/today: 41',
+  '[STATUS] ownership:  assigned: 41/41',
+  '[STATUS] drafts:     prepared: 18 | approved: 16',
+  '[STATUS] followup:   on-time: 96.4%',
+  '[STATUS] stale:      flagged: 3 | resolved: 3',
+  '[OK]     record:     ats sync 100% consistent',
+  '[STATUS] handoff:    placements → onboarding: 2',
+  '[WARN]   connector:  hubspot rate-limit → backoff 2s',
+  '[STATUS] report:     time-to-record avg: 11s',
+  '[STATUS] report:     time-to-owner avg: 38s',
+  '[OK]     access:     least-privilege verified',
+  '[STATUS] pii:        anonymized test set in use',
+  '[STATUS] intake:    inquiries/today: 42',
+  '[STATUS] drafts:     prepared: 19 | approved: 17',
+  '[OK]     followup:   no missed next-step actions',
 ];
 
-const networkLogs = [
-  '> ws://agents.zeptaz.io connected [latency: 12ms]',
-  '> pipe: leadgen → crm.upsert(contact)',
-  '> pipe: support → slack.notify(#team)',
-  '> sync: hubspot ↔ zeptaz [2,047 records]',
-  '> webhook recv: stripe/payment.succeeded',
-  '> pipe: finance → quickbooks.reconcile()',
-  '> ws heartbeat [14ms] [seq: 1,042]',
-  '> pipe: hr → greenhouse.update(candidate)',
-  '> sync: google_sheets ↔ outreach [ok]',
-  '> webhook recv: github/push → ci.trigger',
-  '> pipe: predict → dashboard.refresh()',
-  '> ws heartbeat [11ms] [seq: 1,043]',
-  '> cache invalidated: lead_scores [ttl: 300s]',
-  '> pipe: social → analytics.ingest()',
-  '> rate_limit: 0/1000 reqs remaining → cooldown',
+const netLogs = [
+  '> pipe: intake → ats.upsert(record)',
+  '> pipe: field-check → flag(missing:phone)',
+  '> pipe: categorize → label("client · contract")',
+  '> pipe: owner → slack.notify(@recruiter)',
+  '> pipe: draft → queue(human-approval)',
+  '> sync: bullhorn ↔ zeptaz [1,204 records]',
+  '> pipe: followup → task.create(+1d)',
+  '> pipe: stale → alert(owner, "no next step")',
+  '> webhook recv: form.submit → intake',
+  '> pipe: handoff → onboarding.checklist()',
+  '> pipe: report → dashboard.refresh()',
+  '> heartbeat [12ms] seq:8821',
+  '> pipe: record → crm.update(stage)',
+  '> guard: ai.autosend=false → draft only',
+  '> heartbeat [11ms] seq:8822',
 ];
 
-function TerminalPane({
-  lines,
-  duration,
-}: {
-  lines: string[];
-  duration: string;
-}) {
-  // Duplicate lines for seamless loop
+function Pane({ lines, duration }: { lines: string[]; duration: string }) {
   const doubled = [...lines, ...lines];
   return (
-    <div className="flex-1 overflow-hidden min-w-0">
-      <div
-        className="terminal-pane flex flex-col gap-[6px]"
-        style={{ '--scroll-duration': duration } as React.CSSProperties}
-      >
+    <div className="min-w-0 flex-1 overflow-hidden">
+      <div className="terminal-pane flex flex-col gap-[6px]" style={{ '--scroll-duration': duration } as React.CSSProperties}>
         {doubled.map((line, i) => (
-          <div
-            key={i}
-            className="whitespace-nowrap text-[11px] leading-[1.6] text-emerald-400"
-            style={{ fontFamily: 'var(--font-mono)', letterSpacing: '0.02em' }}
-          >
+          <div key={i} className="whitespace-nowrap font-mono text-[11px] leading-[1.6] text-emerald-400/90" style={{ letterSpacing: '0.02em' }}>
             {line}
           </div>
         ))}
@@ -103,48 +92,21 @@ function TerminalPane({
 
 export default function TerminalBackdrop() {
   return (
-    <div
-      className="absolute inset-0 overflow-hidden pointer-events-none"
-      aria-hidden="true"
-    >
-      {/* Dot grid layer */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px)',
-          backgroundSize: '28px 28px',
-        }}
-      />
-
-      {/* Bottom crimson radial glow */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: 'radial-gradient(ellipse 70% 45% at 50% 100%, rgba(220,20,60,0.08), transparent 65%)',
-        }}
-      />
-
-      {/* Animated terminal panes — visible on lg+ only */}
-      <div
-        className="absolute inset-0 hidden lg:flex gap-6 px-6 pt-20"
-        style={{ opacity: 0.13 }}
-      >
-        <TerminalPane lines={agentLogs} duration="28s" />
-        <TerminalPane lines={deployLogs} duration="22s" />
-        <TerminalPane lines={statusLogs} duration="32s" />
-        <TerminalPane lines={networkLogs} duration="25s" />
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      {/* dot grid */}
+      <div className="absolute inset-0 dot-grid" />
+      {/* crimson radial glow */}
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 72% 48% at 50% 100%, rgba(220,20,60,0.12), transparent 64%)' }} />
+      {/* scrolling panes */}
+      <div className="absolute inset-0 hidden gap-7 px-7 pt-24 lg:flex" style={{ opacity: 0.12 }}>
+        <Pane lines={intakeLogs} duration="30s" />
+        <Pane lines={ruleLogs} duration="24s" />
+        <Pane lines={statusLogs} duration="34s" />
+        <Pane lines={netLogs} duration="27s" />
       </div>
-
-      {/* Top edge fade mask */}
-      <div
-        className="absolute top-0 left-0 right-0 h-32 pointer-events-none"
-        style={{ background: 'linear-gradient(to bottom, #080808 0%, transparent 100%)' }}
-      />
-      {/* Bottom edge fade mask */}
-      <div
-        className="absolute bottom-0 left-0 right-0 h-32 pointer-events-none"
-        style={{ background: 'linear-gradient(to top, #080808 0%, transparent 100%)' }}
-      />
+      {/* edge fades */}
+      <div className="absolute inset-x-0 top-0 h-28" style={{ background: 'linear-gradient(to bottom, #080808, transparent)' }} />
+      <div className="absolute inset-x-0 bottom-0 h-40" style={{ background: 'linear-gradient(to top, #080808, transparent)' }} />
     </div>
   );
 }

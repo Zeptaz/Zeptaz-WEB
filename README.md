@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Zeptaz V2 — Web
 
-## Getting Started
+Premium marketing site for **Zeptaz — AI workflow automation for service businesses**.
+Built fresh for V2: Next.js 16 (App Router) · React 19 · Tailwind v4 · GSAP + ScrollTrigger · Lenis.
 
-First, run the development server:
+Positioning and copy follow the Final Strategy Report (§17 Website Brand & Content Strategy):
+operator-first, anti-hype, five service categories, and a connected, dependency-locked module engine.
+
+## Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # production build
+npm run start    # serve production build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Stack & conventions
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Animation:** GSAP + ScrollTrigger, synced to **Lenis** smooth scroll
+  (`components/layout/SmoothScroll.tsx`). All effects are gated behind
+  `prefersReducedMotion()` (`lib/gsap.ts`).
+- **Signature scroll scenes:** Hero (pinned), The Engine (pinned + SVG path-draw,
+  desktop only via `gsap.matchMedia`), Process (scroll-drawn progress line).
+- **Design tokens:** `app/globals.css` — dark base + warm light "paper" editorial
+  sections + crimson `#DC143C` accent. Fonts: Big Shoulders (display),
+  JetBrains Mono (labels), Inter (body/headings).
+- **Content source of truth:** `app/lib/constants.ts`.
+- **Illustrations (in-code, animated):** `app/components/illustrations/`
+  — `ChannelChaos` (problem), `IsoArt` (service cards), `ParticleSphere` (core offer).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Structure
 
-## Learn More
+```
+app/
+  page.tsx                 # homepage — section order
+  layout.tsx               # fonts, metadata, SmoothScroll + Navbar + Footer
+  globals.css              # design system
+  components/
+    layout/  Navbar, Footer, SmoothScroll
+    sections/ Hero, Problem, CoreOffer, ServiceCategories, Engine,
+              Differentiators, Integrations, Process, Packages,
+              TrustSecurity, Team, Faq, FinalCta
+    ui/       Eyebrow, Reveal, StatCounter, Button, Section, LogoMark, TerminalBackdrop
+    illustrations/
+  lib/        gsap, gsap-utils, constants, utils
+  hooks/      useReducedMotion, useMediaQuery
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Multipage roadmap (not yet built)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This repo currently ships the **homepage** only. Service cards and nav are written so
+detail pages can be added later (e.g. `app/services/[slug]/page.tsx`): Services detail,
+About, Pricing, Contact, Blog. Section IDs (`#services`, `#engine`, `#process`,
+`#packages`, `#faq`, `#contact`) double as in-page anchors today.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The contact form in `FinalCta` is a working UI stub — wire `@emailjs/browser` (already a
+dependency) or a server action to send.

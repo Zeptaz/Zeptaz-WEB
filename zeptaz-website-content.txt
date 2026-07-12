@@ -1,0 +1,566 @@
+ZEPTAZ WEBSITE — FULL PAGE CONTENT
+===================================
+(AI workflow automation for service businesses)
+
+
+GLOBAL — NAVBAR
+================
+Logo: Zeptaz
+Nav links: Services · Engine · Process · Pricing · About
+CTA button: Book a call
+
+
+GLOBAL — FOOTER
+================
+Tagline: Reliable AI workflow automation for service businesses. Operator-first, human-approved.
+
+Newsletter: "Operator notes - workflow leak lessons, no fluff"
+  Email input placeholder: you@company.com
+
+Navigate: Services · Engine · Process · Pricing · About
+Company: About · Pricing · Contact
+Policies: Privacy · Terms · Data Handling
+
+Bottom bar: © [year] Zeptaz - AI workflow automation for service businesses
+            Built operator-first · Human-approved AI
+
+Giant wordmark: ZEPTAZ (ASCII-art background showing through the letters)
+
+
+================================================================
+PAGE: HOME ( / )
+================================================================
+
+--- HERO ---
+Eyebrow: Workflow Automation
+Headline: Stop running / operations by hand.
+Subhead: We automate the handoffs, follow-ups, and updates that eat your team's day.
+CTA: Book a Workflow Fit Call
+Scroll hint: Scroll ▼
+
+(Reference stats, not shown live in Hero but part of the copy set:
+  5 — Service workflows automated
+  11 — Modules in the engine
+  100% — AI outputs human-approved)
+
+--- THE PROBLEM ---
+Eyebrow: The Problem
+Title: Work enters from everywhere - and gets stuck between tools.
+Lead: Inquiries arrive through forms, email, CRMs, documents, ads, referrals, and internal requests. But ownership, handoffs, updates, and follow-ups get messy - and important work quietly goes stale.
+
+Channels: Web forms · Email & inbox · CRM / ATS · Documents · Ads · Referrals · Internal requests
+
+Pain points:
+  1. No owner — Unclear ownership
+     Inquiries sit in inboxes and forms with no one accountable for the next step.
+  2. Manual — Records fall behind
+     CRM/ATS updates are done by hand, so records are incomplete and inconsistent.
+  3. Missed — Follow-ups slip
+     Recruiters and teams remember follow-ups manually - until they don't.
+  4. Stale — No visibility
+     Owners and managers can't see where response and follow-up gaps are forming.
+
+--- SERVICE CATEGORIES ---
+Eyebrow: Service Categories
+Title: Five workflows under one umbrella.
+
+1. Recruitment Workflow Automation (Recruitment)
+   Candidate and client inquiries become clean ATS records with an owner and a next step.
+   Bullets: Candidate / client inquiry intake · ATS updates & recruiter routing · Follow-up tasks · Stale-inquiry alerts
+
+2. Sales Workflow Automation (Sales)
+   Leads get routed, records stay clean, and follow-ups stop falling through the cracks.
+   Bullets: Lead routing · CRM hygiene · Response drafts · Follow-up reminders & deal handoffs
+
+3. Client Onboarding Automation (Onboarding)
+   Closed-won deals turn into a clean handoff and a repeatable onboarding sequence.
+   Bullets: Closed-won handoff · Setup tasks · Internal briefs · Onboarding checklists
+
+4. Marketing Operations Automation (Marketing Ops)
+   Campaigns, approvals, and asset handoffs move without manual chasing.
+   Bullets: Campaign setup · Approvals · Asset handoffs · Internal status updates
+
+5. Reporting & Document Automation (Reporting & Docs)
+   Form-to-record workflows and operational reports generate themselves on schedule.
+   Bullets: Form-to-record workflows · Operational reports · Internal summaries · Document generation
+
+--- THE ENGINE ---
+Eyebrow: The Engine
+Title: One connected engine - dependency-locked, not a menu.
+Lead: Each module builds on the accuracy of the one before it. You size the build - Starter, Growth, or Scale - but you don't gut load-bearing steps that hold the system together.
+
+Modules (11):
+  1. Inquiry Intake — Captures the inquiry from form, email, landing page, or connected source. [All tiers]
+  2. ATS / CRM Record — Creates or updates a structured record - no manual data entry. [All tiers]
+  3. Field Check — Checks required fields and flags missing information. [All tiers]
+  4. Categorization — Classifies candidate, client, or job inquiry into the agreed category. [All tiers]
+  5. Owner Assignment — Routes to the correct recruiter, team, or fallback owner. [All tiers]
+  6. Team Alert — Notifies the right person on the right channel. [All tiers]
+  7. AI Response Draft — Prepares a draft for human approval - never sends on its own. [Growth, Scale] (human-approval flag)
+  8. Follow-up Task — Schedules the next action in your ATS/CRM/task system. [All tiers]
+  9. Stale-Inquiry Flag — Flags inquiries with no movement after the agreed time. [Growth, Scale] (alert flag)
+  10. Placement Handoff — Triggers the next-step handoff after a conversion. [Scale only]
+  11. Reporting — Keeps consistent records so reporting actually adds up. [Scale only]
+
+--- WHY ZEPTAZ (Differentiators) ---
+Eyebrow: Why Zeptaz
+Title: Not another AI hype shop.
+Lead: Most AI vendors sell magic, autonomy, and guaranteed numbers. We sell reliable systems with clear boundaries - operator-first, specific, and skeptical.
+
+01 — Not lead generation → We fix the work you already have
+    We don't promise new leads or cold outreach. We improve how inbound inquiries get handled, owned, and followed up.
+02 — Not random zaps → A connected system, not a menu
+    Modules depend on each other. You size the build - you don't cherry-pick load-bearing steps that break the system.
+03 — Not autonomous AI → AI stays human-approved
+    AI drafts and sensitive outputs are prepared for human review. No autonomous sending, no candidate ranking, no hiring decisions.
+04 — Not broad access → Minimum access, data-safe
+    Least-privilege by default: no raw password sharing, anonymized or test data where possible, clear PII handling.
+05 — Not hype-first → Operator-first and specific
+    We work in workflow maps, examples, and operational consequences - not jargon or guaranteed-revenue claims.
+06 — Not duct tape → Reliable systems over one-offs
+    A maintained workflow engine beats a drawer of brittle one-off automations that quietly break.
+
+--- INTEGRATIONS ---
+Eyebrow: Integrations
+Title: We connect the tools your team already uses.
+Lead: Connector-first: no-code / low-code connector where possible, native webhook or API where needed. Every project passes a compatibility and access check before we build.
+
+Logos: HubSpot · Salesforce · Slack · Microsoft Teams · Gmail · Zapier · Make · n8n · Notion · QuickBooks
+(...and anything with a connector or API)
+
+--- HOW IT WORKS (Process) ---
+Eyebrow: How It Works
+Title: From fit call to managed plan.
+
+01. Workflow Fit Call — A short, low-friction conversation to see how inquiries move from form/inbox to an owner and a follow-up. (30-45 minutes)
+02. Diagnostic — We map your current flow, name the top leak points, and recommend a founding build scope. (3-5 business days)
+03. Access Lock — The readiness gate. Access, test data, routing rules, and owners are confirmed before the clock starts. (Driven by your side - typically under a week)
+04. Build — We build the reusable workflow engine against approved test data - connector-first, modular. (Per package - 10 business days to 6 weeks)
+05. UAT — You test agreed pass/fail scenarios. Feedback is consolidated into one punch list, then fixed. (3-5 business days)
+06. Handover — Runbook, workflow map, limitations, and responsibilities reviewed. The build phase ends formally. (One session)
+07. Managed Plan — Optional ongoing plan with hour-capped support, monitoring, and change requests. (Monthly - cancel anytime)
+
+--- PACKAGES ---
+Eyebrow: Packages
+Title: Sized builds, after proof.
+
+Starter Build — Get inquiries owned and followed up.
+  Price: $1,500 local from / $3,000 international
+  Timeline: 10 business days after Access Lock
+  Scope: Intake & ATS/CRM update · Required field check · Owner assignment · Team alert · Basic follow-up task
+
+Growth Build (featured) — Add AI drafts and stale-inquiry logic.
+  Price: $3,000 local from / $6,000 international
+  Timeline: 2-3 weeks after Access Lock
+  Scope: Everything in Starter · AI response drafts (human-approved) · Stale-inquiry alerts · Richer follow-up logic · Stronger logs
+
+Scale Build — A multi-workflow operations system.
+  Price: $7,500 local from / $15,000 international
+  Timeline: 4-6 weeks after Access Lock
+  Scope: Everything in Growth · Multi-workflow across intake & follow-up · Handoff & reporting · Operations dashboards · Connector layer per system
+
+--- THE TEAM ---
+Eyebrow: The Team
+Title: People behind the system.
+
+Tevin Bandara — Co-Founder
+  Maps client workflows and keeps every build accountable to an operational outcome, not a demo.
+Sasindu Silva — Co-Founder
+  Designs the connector layer - the unglamorous plumbing that keeps records in sync.
+Naveen Harry — Co-Founder
+  Owns testing and reliability - the pass/fail scenarios and punch list nothing ships without.
+Jayith Wijethunge — Co-Founder
+  Builds the engine's automation logic and the human-approval loops around the AI.
+
+--- GET STARTED (Final CTA) ---
+Eyebrow: Get Started
+Title: Stop chasing. Start shipping work.
+Lead: Book a workflow fit call. We'll look at how inquiries move from form and inbox to an owner and a follow-up - and where work is leaking today.
+
+Included:
+  - Free / discounted founding diagnostic
+  - A 1-3 page flow map with the top leak points
+  - A recommended build scope, timeline, and price range
+
+Form fields: Name · Work email · ATS / CRM you use · "Where do inquiries get stuck?"
+Submit button: Book a Workflow Fit Call
+Footnote: No spam · No autonomous outreach
+Success message: Thanks - we'll be in touch. We reply to fit-call requests within one business day.
+
+
+================================================================
+PAGE: SERVICES ( /services )
+================================================================
+Meta title: Automation Services - Zeptaz
+Meta description: Workflow automation systems for recruitment, sales, onboarding, marketing operations, reporting, and documents. Deliverables, example runs, and outcomes for each system.
+
+--- PAGE HERO ---
+Eyebrow: Automation Services
+Title: Systems for the work you already have.
+Lead: We connect the tools your team already uses into one reliable workflow across intake, sales, onboarding, marketing operations, reporting, and documents. AI assists inside a controlled workflow, it does not run loose.
+
+--- CORE OFFER ---
+Eyebrow: What We Build
+Title: Workflow automation systems - not a pile of one-off zaps.
+Lead: We connect the tools your team already uses into one reliable system across intake, sales, onboarding, marketing operations, reporting, and documents. AI assists inside a controlled workflow; it doesn't run loose.
+
+Points:
+  - Connected, dependency-locked - modules build on each other.
+  - Human-approved AI - drafts and sensitive outputs wait for a person.
+  - Minimum-access by default - no raw passwords, anonymized test data.
+
+--- THE FIVE SYSTEMS (Service Deep) ---
+Eyebrow: The Five Systems
+Title: What each system actually does.
+
+1. Recruitment Workflow Automation
+   Deliverables:
+     - Intake workflows wired to your forms, shared inboxes, and landing pages
+     - ATS record creation and update rules mapped to your fields
+     - Recruiter routing logic with named fallback owners
+     - Follow-up task templates and stale-inquiry alerting
+   Example run (terminal trace):
+     inquiry.received (web-form: candidate)
+     ats.record.create → fields.verify
+     route → recruiter.on_duty [fallback: team-lead]
+     reply.draft.ready [human-approve]
+     follow-up.scheduled +48h
+   Outcome: Every candidate and client inquiry gets an owner, a clean ATS record, and a scheduled next step - without a recruiter copying data by hand.
+
+2. Sales Workflow Automation
+   Deliverables:
+     - Lead routing rules by territory, source, or round-robin
+     - CRM hygiene automations - dedupe, field completion, stage sync
+     - AI response drafts queued for rep approval
+     - Follow-up reminders and deal-stage handoffs
+   Example run:
+     lead.captured (ad-form: pricing-page)
+     crm.record.upsert → dedupe.check
+     route → rep.round_robin(region)
+     outreach.draft.ready [human-approve]
+     reminder.set (no-reply +3d)
+   Outcome: Leads stop sitting unclaimed in the inbox - each one lands on a rep's plate with a clean record and a reminder that won't forget.
+
+3. Client Onboarding Automation
+   Deliverables:
+     - Closed-won trigger wired to your CRM stage change
+     - Kickoff checklist and task sequence in your task system
+     - Internal brief auto-drafted from the deal record
+     - Status updates posted to the account channel
+   Example run:
+     deal.closed_won (crm: stage-change)
+     handoff.brief.generate [human-approve]
+     tasks.create (kickoff checklist)
+     owner.assign → delivery-team
+     status.post → #client-channel
+   Outcome: The win never stalls in the gap between sales and delivery - kickoff starts itself the moment the deal closes.
+
+4. Marketing Operations Automation
+   Deliverables:
+     - Campaign setup checklists triggered from a brief or calendar
+     - Approval loops with named reviewers and automatic reminders
+     - Asset handoff flows between brief, design, and channel owners
+     - Status rollups posted where the team already works
+   Example run:
+     campaign.brief.submitted
+     tasks.spawn (setup: channels, tracking, assets)
+     approval.request → reviewer [reminder +24h]
+     assets.handoff → channel-owner
+     status.rollup → #marketing
+   Outcome: Campaigns move from brief to live without a coordinator chasing approvals and assets across four tools.
+
+5. Reporting & Document Automation
+   Deliverables:
+     - Form-to-record pipelines with validation on entry
+     - Scheduled operational reports built from live system data
+     - Internal summaries drafted for human review
+     - Templated document generation - briefs, SOWs, letters
+   Example run:
+     schedule.trigger (weekly: fri 07:00)
+     data.pull (ats, crm, tasks)
+     report.compile → summary.draft [human-approve]
+     doc.generate (template: weekly-ops)
+     deliver → inbox + archive
+   Outcome: The weekly numbers assemble themselves from records that are actually consistent - no more Friday spreadsheet archaeology.
+
+--- CONNECTS WITH STRIP ---
+Connects with: HubSpot · Salesforce · Slack · Microsoft Teams · Gmail · Zapier · Make · n8n · Notion · QuickBooks · and anything with a connector or API
+
+--- CTA BAND ---
+Title: See your workflow automated.
+
+
+================================================================
+PAGE: THE ENGINE ( /engine )
+================================================================
+Meta title: The Engine - Zeptaz
+Meta description: The anatomy of the connected engine: 11 dependency-locked modules from inquiry intake to reporting, what each one does, and which build tier includes it.
+
+--- PAGE HERO ---
+Eyebrow: The Engine
+Title: One connected engine, not a menu.
+Lead: Each module builds on the accuracy of the one before it. This page is the anatomy: what every station does, why it can't be skipped, and which build tier includes it.
+
+--- STATS BAND ---
+5 — Service workflows automated
+11 — Modules in the engine
+100% — AI outputs human-approved
+Link: "See the engine in motion on the home page"
+
+--- MODULE ANATOMY (Module Spine) ---
+Eyebrow: Module Anatomy
+Title: Eleven stations, one route.
+
+(Full detail per module — anatomy copy)
+1. Inquiry Intake
+   Watches every connected entry point - forms, shared inboxes, landing pages, imports - and normalizes what arrives into one shape the rest of the engine can trust. Nothing depends on a person noticing a notification.
+
+2. ATS / CRM Record
+   Creates or updates the ATS/CRM record the moment intake fires, mapped to your fields and formats. Every module downstream reads from this record - which is exactly why it can't be skipped.
+
+3. Field Check
+   Validates the record against the required-field list you approve during scoping. Incomplete records get flagged with exactly what's missing instead of quietly rotting in the system.
+
+4. Categorization
+   Sorts the inquiry into the categories you already operate with - candidate, client, job, or your own taxonomy. Routing and reporting both depend on this label being right.
+
+5. Owner Assignment
+   Applies your routing rules to give the inquiry a named owner, with a fallback when the first choice is unavailable. Unclear ownership is the single biggest leak we see - this module closes it.
+
+6. Team Alert
+   Tells the owner on the channel they actually watch - Slack, Teams, or email - with the record linked. No dashboard someone has to remember to check.
+
+7. AI Response Draft (human-approval)
+   Prepares a context-aware reply from the record and your tone guidelines, then stops. A person reviews, edits, and sends - the system never messages anyone on its own.
+
+8. Follow-up Task
+   Books the next action into your ATS, CRM, or task system with the owner and due date attached. Follow-through stops depending on anyone's memory.
+
+9. Stale-Inquiry Flag (alert)
+   Watches for inquiries with no movement past the threshold you set and raises them to a person. Nothing is auto-archived - a human decides what stale means.
+
+10. Placement Handoff
+    Fires the agreed next-step sequence the moment an inquiry converts - placement made, deal closed, contract signed. The win doesn't stall in the gap between teams.
+
+11. Reporting
+    Because every upstream module writes consistent records, the numbers finally reconcile. Response times, follow-up rates, and aging inquiries roll up without a spreadsheet exercise.
+
+--- ANTI-CHERRY-PICKING ---
+Eyebrow: Anti-Cherry-Picking
+Title: Why you can't skip stations.
+
+An AI draft written from an incomplete record is a bad draft. A follow-up task with no named owner is a task nobody does. A report built on inconsistent records is fiction with a chart. Every module on the spine exists because the one after it fails without it.
+
+That's why our packages set reach, not composition. Starter, Growth, and Scale run the same route with more stations switched on - you never remove a load-bearing step to hit a price point, because six months later that's the step whose absence you're paying for.
+
+Two stations deliberately stay under human control: AI response drafts wait for a person to approve them, and stale inquiries are raised to a person instead of being auto-archived. The system prepares; your team decides.
+
+--- CTA BAND ---
+Title: Build the connected engine.
+
+
+================================================================
+PAGE: PRICING ( /pricing )
+================================================================
+Meta title: Pricing - Zeptaz
+Meta description: Starter, Growth, and Scale builds with a full module-by-module manifest, engagement terms, and pricing FAQ. Timelines begin only after Access Lock is complete.
+
+--- PAGE HERO ---
+Eyebrow: Pricing
+Title: Sized builds, priced after proof.
+Lead: Pick the scope, not the loose parts. Every package is the same connected engine, just more modules and reach. Final pricing follows the founding diagnostic.
+
+--- PACKAGES ---
+(see Packages section above — Starter / Growth / Scale)
+
+--- BUILD MANIFEST (Tier Manifest) ---
+Eyebrow: Build Manifest
+Title: Exactly which modules each build ships.
+(Module-by-module table across Starter / Growth / Scale tiers — see Engine modules list above for tier assignment.)
+
+--- HOW ENGAGEMENTS RUN ---
+Eyebrow: How Engagements Run
+Title: Fixed scope, formal handover, optional support.
+Lead: Every build follows the same shape: scoped after the diagnostic, clocked from Access Lock, closed with a formal handover. No open-ended retainer disguised as a project.
+
+Terms:
+  Timeline — Starts at Access Lock, never at contract signature. Starter lands in 10 business days; Growth in 2-3 weeks; Scale in 4-6 weeks.
+  Scoping — The founding diagnostic produces the scope, timeline, and price range. You approve the number before the build starts - no surprise line items mid-project.
+  Handover — Runbook, workflow map, known limitations, and named responsibilities - reviewed together in one session. The build phase closes formally.
+  Ownership — The workflows run in your accounts on your tools. Walk away after handover and everything keeps working - and stays yours.
+  Support — The optional Managed Plan adds hour-capped support, monitoring, and change requests on a monthly basis. It is not required to keep the system running.
+  Changes — In-build changes go through the UAT punch list. Post-handover changes run through the Managed Plan or a scoped mini-build.
+
+Note: Final pricing depends on workflow complexity, ATS/CRM access, connector availability, data quality, AI involvement, module count, and support needs. Timelines begin only after Access Lock is complete.
+
+--- FAQ (Pricing) ---
+Q: When does the timeline start?
+A: After Access Lock is complete - once access, test data, routing rules, and owners are confirmed.
+
+Q: What affects the final price?
+A: Workflow complexity, ATS/CRM access, connector availability, data quality, AI involvement, module count, and support needs. The founding diagnostic pins the number before you commit.
+
+Q: Is the Managed Plan required?
+A: No. The build ends formally at Handover with a runbook and workflow map. The Managed Plan is an optional monthly, hour-capped add-on for monitoring and change requests.
+
+Q: Can we start small and expand later?
+A: Yes - that's the point of the tiers. Starter, Growth, and Scale are the same engine at different reach, so upgrading adds modules without rebuilding what you have.
+
+--- CTA BAND ---
+Title: Get a build scope and price.
+
+
+================================================================
+PAGE: HOW IT WORKS ( /process )
+================================================================
+Meta title: How It Works - Zeptaz
+Meta description: The full path from Workflow Fit Call to Managed Plan: what we need from you, what we deliver, and how long each step takes. The delivery clock only starts at Access Lock.
+
+--- PAGE HERO ---
+Eyebrow: How It Works
+Title: From fit call to managed plan.
+Lead: A deliberate, low-friction path. The delivery clock only starts at Access Lock, once access, test data, routing rules, and owners are confirmed.
+
+--- PROCESS STEPS ---
+(see Process section above — 01 Workflow Fit Call through 07 Managed Plan)
+
+--- THE FINE PRINT (Step Ledger) ---
+Eyebrow: The Fine Print
+Title: What each step actually asks of you.
+Lead: No mystery phases. For every step: what we need from your side, what lands on ours, and how long it takes.
+
+01. Workflow Fit Call
+    You bring: 30 minutes and honest answers about how inquiries move today.
+    We deliver: A straight read on whether automation helps - and a clear no if it doesn't.
+    Duration: 30-45 minutes
+
+02. Diagnostic
+    You bring: A walkthrough of your tools and a few real (redacted) inquiry examples.
+    We deliver: A 1-3 page flow map, the top leak points, and a recommended scope with a price range.
+    Duration: 3-5 business days
+
+03. Access Lock
+    You bring: Scoped access, test data, routing rules, and named owners - confirmed.
+    We deliver: A readiness checklist signed off by both sides. The delivery clock starts here.
+    Duration: Driven by your side - typically under a week
+
+04. Build
+    You bring: Availability for quick clarification questions - not a meeting marathon.
+    We deliver: The workflow engine built connector-first against approved test data, with logs.
+    Duration: Per package - 10 business days to 6 weeks
+
+05. UAT
+    You bring: Run the agreed pass/fail scenarios against your real cases.
+    We deliver: One consolidated punch list and the fixes - not an endless revision loop.
+    Duration: 3-5 business days
+
+06. Handover
+    You bring: One session with the people who will own the system day to day.
+    We deliver: Runbook, workflow map, known limitations, and named responsibilities - formally closed.
+    Duration: One session
+
+07. Managed Plan
+    You bring: Nothing - it's optional. Choose it if you want us on call.
+    We deliver: Hour-capped support, monitoring, and change requests under a monthly cap.
+    Duration: Monthly - cancel anytime
+
+--- TRUST & SECURITY (Access Ledger) ---
+Eyebrow: Trust & Security
+Title: Built to be safe inside your stack.
+Lead: We treat candidate, client, and operational data carefully. AI is an assistant inside a controlled workflow - not an autonomous actor. The fastest way to show it is our own access log - note what gets denied.
+
+Access log ($ zeptaz access --audit):
+  DENIED — request: full CRM/ATS export
+    Minimum access — We request only the candidate, client, and job data the approved workflow needs.
+  DENIED — request: raw password share
+    No raw passwords — Invitations, OAuth, restricted API keys, or client-owned accounts only.
+  DENIED — request: live PII for build
+    Anonymized test data — Logic is engineered on anonymized or representative test data where possible.
+  DENIED — request: ai.send(unreviewed)
+    Human-approved AI — AI drafts and sensitive outputs are prepared for human review and approval.
+  GRANTED — request: scoped workflow access [approved-by: you]
+    The only access we take — Exactly the scope confirmed at Access Lock - reviewed with you, revocable by you.
+
+  ok · least-privilege by default - the system can't leak what it never had
+
+--- CTA BAND ---
+Title: Start with a fit call.
+
+
+================================================================
+PAGE: ABOUT ( /about )
+================================================================
+Meta title: About Zeptaz
+Meta description: Why Zeptaz exists, the principles every build follows, and the founding team. Operator-first, human-approved, and skeptical of hype.
+
+--- PAGE HERO ---
+Eyebrow: About Zeptaz
+Title: The people behind the system.
+Lead: AI workflow automation for service businesses. Operator-first, human-approved, and built to be reliable inside your stack.
+
+--- OUR STORY ---
+Eyebrow: Our story
+Title: Reliable systems over hype.
+
+We started Zeptaz because the same thing kept breaking inside good service businesses: work entered from everywhere, then got stuck between tools. Inquiries lost an owner, records fell behind, and follow-ups slipped.
+
+So we build the boring, load-bearing systems that keep work moving. Connected workflows across intake, sales, onboarding, marketing operations, and reporting, with AI kept inside a controlled, human-approved loop.
+
+We are operator-first and specific. We work in workflow maps, examples, and operational consequences, not jargon or guaranteed-revenue claims.
+
+(Callout: "The pattern we kept seeing" — illustration of channel chaos)
+
+--- OPERATING PRINCIPLES ---
+Eyebrow: Operating Principles
+Title: Six things we refuse to be.
+Lead: Every build gets held against these. They cost us some projects - that's the point.
+
+(same six differentiators as the homepage — see "WHY ZEPTAZ" above:
+ 01 Not lead generation, 02 Not random zaps, 03 Not autonomous AI,
+ 04 Not broad access, 05 Not hype-first, 06 Not duct tape)
+
+--- THE TEAM ---
+(see Team section above — Tevin, Sasindu, Naveen, Jayith)
+
+--- FAQ (General) ---
+Q: What do you automate?
+A: Intake, routing, CRM/ATS updates, follow-ups, handoffs, approvals, reporting, and documents across your service workflows.
+
+Q: Do you replace our team?
+A: No. The system reduces admin chasing and prepares drafts, tasks, alerts, and summaries. Your team stays in control.
+
+Q: Do automations send messages automatically?
+A: Not by default. AI drafts and sensitive workflow outputs are prepared for human review and approval.
+
+Q: Can you work with any CRM, ATS, or tool?
+A: Only if access and integration are practical. Projects must pass compatibility and access checks first - connector-first, then API where needed.
+
+Q: How do you handle our data?
+A: Minimum required access, no raw password sharing, and anonymized or test data where possible.
+
+--- CTA BAND ---
+Title: Work with us.
+Lead: Book a workflow fit call and we will map where work is leaking, then recommend a build scope, timeline, and price range.
+
+
+================================================================
+PAGE: CONTACT ( /contact )
+================================================================
+Meta title: Contact - Zeptaz
+Meta description: Book a workflow fit call. We look at how inquiries move from form and inbox to an owner and a follow-up, and where work is leaking today.
+
+(Reuses the Final CTA section — see "GET STARTED" on the homepage:
+ Title: Stop chasing. Start shipping work.
+ Lead: Book a workflow fit call. We'll look at how inquiries move from form
+ and inbox to an owner and a follow-up - and where work is leaking today.
+ Form: Name / Work email / ATS-CRM used / "Where do inquiries get stuck?")
+
+--- CONTACT INFO STRIP ---
+Email — hello@zeptaz.com
+Response time — We reply to fit-call requests within one business day.
+No autonomous outreach — No spam, no cold sending. AI stays human-approved.
+
+
+================================================================
+END OF FILE
+================================================================
