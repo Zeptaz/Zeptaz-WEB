@@ -24,3 +24,6 @@ npm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 .vercel
+
+# local tooling
+.mcp.json
