@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { TEAM } from '@/lib/constants';
 import CoverImageField from './CoverImageField';
 import type { PostInput } from '@/lib/types';
 
@@ -81,6 +82,25 @@ export default function PostSettingsPanel({
         prefix={`covers/${postId}`}
         onChange={(url) => update({ cover_image_url: url })}
       />
+
+      <div>
+        <label htmlFor="author" className="mono-meta mb-2 block text-text-muted">Author</label>
+        {/* datalist = co-founders one click away, but a custom byline is still allowed */}
+        <input
+          id="author"
+          list="author-options"
+          value={form.author}
+          onChange={(e) => update({ author: e.target.value })}
+          placeholder="Zeptaz"
+          className={inputClass}
+        />
+        <datalist id="author-options">
+          <option value="Zeptaz" />
+          {TEAM.map((m) => (
+            <option key={m.name} value={m.name} />
+          ))}
+        </datalist>
+      </div>
 
       <div>
         <div className="mb-2 flex items-center justify-between">

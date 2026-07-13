@@ -2,7 +2,7 @@ import { createPublicClient } from '@/lib/supabase/public';
 import type { Post, PostSummary } from '@/lib/types';
 
 const SUMMARY_FIELDS =
-  'id, title, slug, excerpt, cover_image_url, tags, status, meta_title, meta_description, og_image_url, published_at, created_at, updated_at';
+  'id, title, slug, author, excerpt, cover_image_url, tags, status, meta_title, meta_description, og_image_url, published_at, created_at, updated_at';
 
 /** Published posts for the /blog listing, newest first; optional tag filter. */
 export async function getPublishedPosts(tag?: string): Promise<PostSummary[]> {

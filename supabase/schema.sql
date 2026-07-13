@@ -8,6 +8,7 @@ create table public.posts (
   id               uuid primary key default gen_random_uuid(),
   title            text not null default '',
   slug             text not null unique,
+  author           text not null default 'Zeptaz',     -- byline shown under the post title
   excerpt          text not null default '',           -- listing card + fallback meta description
   content_json     jsonb not null default '{}'::jsonb, -- canonical Tiptap document
   content_html     text not null default '',           -- sanitized render for the public site

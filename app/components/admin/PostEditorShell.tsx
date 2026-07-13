@@ -14,6 +14,7 @@ export default function PostEditorShell({ post }: { post: Post }) {
   const [form, setForm] = useState({
     title: post.title,
     slug: post.slug,
+    author: post.author,
     excerpt: post.excerpt,
     tags: post.tags,
     cover_image_url: post.cover_image_url,

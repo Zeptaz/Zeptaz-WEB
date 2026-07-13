@@ -5,6 +5,7 @@ export interface Post {
   id: string;
   title: string;
   slug: string;
+  author: string;
   excerpt: string;
   content_json: Record<string, unknown>;
   content_html: string;
@@ -24,6 +25,7 @@ export type PostInput = Pick<
   Post,
   | 'title'
   | 'slug'
+  | 'author'
   | 'excerpt'
   | 'content_json'
   | 'content_html'

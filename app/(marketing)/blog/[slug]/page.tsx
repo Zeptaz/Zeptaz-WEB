@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description,
       type: 'article',
       publishedTime: post.published_at ?? undefined,
+      authors: [post.author],
       tags: post.tags,
       ...(ogImage ? { images: [ogImage] } : {}),
     },
@@ -54,7 +55,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
     datePublished: post.published_at,
     dateModified: post.updated_at,
     ...(post.cover_image_url ? { image: post.cover_image_url } : {}),
-    author: { '@type': 'Organization', name: SITE.name },
+    author: { '@type': 'Person', name: post.author },
     publisher: { '@type': 'Organization', name: SITE.name },
   };
 
@@ -66,13 +67,16 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
           style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(220,20,60,0.07), transparent 60%)' }}
         />
         <div className="section-shell relative">
-          <Link
-            href="/blog"
-            className="mb-10 inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted transition-colors hover:text-crimson"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> All posts
-          </Link>
           <PostArticle post={post} />
+
+          <div className="mx-auto mt-16 w-full max-w-[760px] border-t border-border pt-8">
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted transition-colors hover:text-crimson"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" /> Back to all posts
+            </Link>
+          </div>
         </div>
       </section>
 
