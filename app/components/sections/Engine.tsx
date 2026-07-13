@@ -130,7 +130,7 @@ export default function Engine() {
     >
       <div
         className="absolute inset-0"
-        style={{ background: 'radial-gradient(ellipse 80% 60% at 60% 40%, rgba(220,20,60,0.07), transparent 60%)' }}
+        style={{ background: 'radial-gradient(ellipse 80% 60% at 60% 40%, rgb(220 20 60 / calc(0.07 * var(--glow-strength))), transparent 60%)' }}
       />
 
       <div className="section-shell relative grid w-full items-center gap-10 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">

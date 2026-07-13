@@ -97,7 +97,7 @@ export default function TerminalBackdrop() {
       {/* dot grid */}
       <div className="absolute inset-0 dot-grid" />
       {/* crimson radial glow */}
-      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 72% 48% at 50% 100%, rgba(220,20,60,0.12), transparent 64%)' }} />
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 72% 48% at 50% 100%, rgb(220 20 60 / calc(0.12 * var(--glow-strength))), transparent 64%)' }} />
       {/* Scrolling panes. Mobile shows fewer (a 375px viewport can't hold four
           columns of mono log) but never zero - this is the hero's texture. */}
       <div className="absolute inset-0 flex gap-5 px-5 pt-24 sm:gap-7 sm:px-7" style={{ opacity: 0.12 }}>

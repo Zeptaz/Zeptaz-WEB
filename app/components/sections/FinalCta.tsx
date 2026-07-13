@@ -50,7 +50,7 @@ export default function FinalCta() {
 
   return (
     <section id="contact" data-nav="dark" className="section-dark section-screen relative overflow-hidden border-t border-border">
-      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 60% 80% at 50% 0%, rgba(220,20,60,0.12), transparent 60%)' }} />
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 60% 80% at 50% 0%, rgb(220 20 60 / calc(0.12 * var(--glow-strength))), transparent 60%)' }} />
       <Drift className="dot-grid opacity-40" />
 
       <div className="section-shell relative">

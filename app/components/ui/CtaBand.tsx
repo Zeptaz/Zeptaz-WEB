@@ -13,7 +13,7 @@ export default function CtaBand({
     <section data-nav="dark" className="section-dark relative overflow-hidden border-t border-border py-24">
       <div
         className="pointer-events-none absolute inset-0"
-        style={{ background: 'radial-gradient(ellipse 60% 80% at 50% 0%, rgba(220,20,60,0.12), transparent 60%)' }}
+        style={{ background: 'radial-gradient(ellipse 60% 80% at 50% 0%, rgb(220 20 60 / calc(0.12 * var(--glow-strength))), transparent 60%)' }}
       />
       <div className="section-shell relative text-center">
         <h2 className="display-hero mx-auto max-w-[16ch] text-text-primary">{title}</h2>

@@ -21,7 +21,6 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
   return (
     <>
       <PageHero
-        eyebrow="Operator Notes"
         title="Workflow lessons, no fluff."
         lead="What we learn building automation inside real service businesses: where work leaks, what actually breaks, and the boring systems that fix it."
       />
