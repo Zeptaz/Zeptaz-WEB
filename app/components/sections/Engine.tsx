@@ -23,25 +23,13 @@ const ADVANCE_MS = 2700;
  * footer carries the section's actual argument (locked chain, not a menu).
  */
 function ModuleCard({ module: m, index: i }: { module: EngineModule; index: number }) {
-  const Icon = m.icon;
   const prev = i > 0 ? ENGINE_MODULES[i - 1] : null;
-  const no = String(i + 1).padStart(2, '0');
 
   return (
     <article className="relative flex h-full flex-col overflow-hidden border border-border bg-bg-subtle/80 p-6 backdrop-blur-sm">
       <span aria-hidden className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-crimson via-crimson/30 to-transparent" />
-      <span
-        aria-hidden
-        className="display-stat pointer-events-none absolute -top-4 right-1 select-none text-[96px] text-text-primary/[0.045]"
-      >
-        {no}
-      </span>
 
-      <span className="relative flex h-12 w-12 items-center justify-center border border-border-strong bg-bg-primary/60 text-crimson">
-        <Icon className="h-[22px] w-[22px]" strokeWidth={1.4} />
-      </span>
-
-      <h3 className="relative mt-6 text-[17px] font-semibold tracking-[-0.01em] text-text-primary">{m.name}</h3>
+      <h3 className="relative text-[17px] font-semibold tracking-[-0.01em] text-text-primary">{m.name}</h3>
       <p className="relative mt-2 text-[13px] leading-relaxed text-text-muted">{m.desc}</p>
 
       {m.flag && (

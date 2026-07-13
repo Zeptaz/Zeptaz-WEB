@@ -2,14 +2,13 @@
 import { useRef, useEffect, useState } from 'react';
 import { gsap, ScrollTrigger, prefersReducedMotion } from '@/lib/gsap';
 import { HERO, SITE } from '@/lib/constants';
-import AsciiWall, { type AsciiWallHandle } from '@/components/ui/AsciiWall';
+import AsciiWall from '@/components/ui/AsciiWall';
 import TerminalBackdrop from '@/components/ui/TerminalBackdrop';
 import Button from '@/components/ui/Button';
 
 export default function Hero() {
   const root = useRef<HTMLDivElement>(null);
   const content = useRef<HTMLDivElement>(null);
-  const wall = useRef<AsciiWallHandle>(null);
   // Resolved after mount so SSR and the first client paint agree (no hydration
   // mismatch); reduced-motion users then swap to the static CSS backdrop.
   const [reduced, setReduced] = useState(false);
@@ -36,7 +35,7 @@ export default function Hero() {
 
       // Reveal plays ONCE the first time the visitor scrolls (see onUpdate below)
       // and never reverses - it's a separate paused timeline, not scrub-linked, so
-      // scrolling back up keeps the text in place. Only the dive below reverses.
+      // scrolling back up keeps the text in place. Only the pull below reverses.
       const revealTl = gsap.timeline({ paused: true });
       revealTl
         .to(lines, { yPercent: 0, duration: 0.5, ease: 'power4.out', stagger: 0.06 }, 0)
@@ -44,7 +43,7 @@ export default function Hero() {
       let revealed = touch;
       const hint = el.querySelector<HTMLElement>('[data-hint]');
 
-      // Pin + dive - still fully scrubbed/reversible.
+      // Pin + hand-off - still fully scrubbed/reversible.
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: el,
@@ -60,14 +59,12 @@ export default function Hero() {
               revealTl.play();
               if (hint) gsap.to(hint, { opacity: 0, duration: 0.4, overwrite: true });
             }
-            // last 40% of the pin = the forward dive into the next section
-            const zoom = self.progress < 0.6 ? 0 : (self.progress - 0.6) / 0.4;
-            wall.current?.dive(zoom);
           },
         },
       });
 
-      // Dwell (readable) → zoom-pull: content scales up + fades into the dive.
+      // Dwell (readable) → zoom-pull: content scales up + fades out. The ASCII
+      // wall behind it now holds steady - no zoom.
       tl.to(content.current, { scale: 1.6, opacity: 0, y: -40, ease: 'power2.in', duration: 0.4 }, 0.6);
     }, el);
 
@@ -93,7 +90,7 @@ export default function Hero() {
     >
       {/* immersive background */}
       <div className="absolute inset-0">
-        {reduced ? <TerminalBackdrop /> : <AsciiWall ref={wall} interactive className="h-full w-full" />}
+        {reduced ? <TerminalBackdrop /> : <AsciiWall interactive className="h-full w-full" />}
       </div>
       {/* legibility scrim */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(8,8,8,0.6),transparent_75%)]" />
