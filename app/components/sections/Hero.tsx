@@ -23,9 +23,16 @@ export default function Hero() {
       const lines = el.querySelectorAll<HTMLElement>('[data-line] > span');
       const fades = el.querySelectorAll<HTMLElement>('[data-fade]');
 
-      // Hidden on entry - only the code tunnel shows until the visitor acts.
-      gsap.set(lines, { yPercent: 115 });
-      gsap.set(fades, { opacity: 0, y: 28 });
+      // On touch the headline ships visible. The hold-until-scroll reveal is a
+      // desktop conceit; on a phone it meant landing on the site and seeing an
+      // animated canvas with no words on it at all.
+      const touch = window.matchMedia('(pointer: coarse)').matches;
+
+      if (!touch) {
+        // Hidden on entry - only the code tunnel shows until the visitor acts.
+        gsap.set(lines, { yPercent: 115 });
+        gsap.set(fades, { opacity: 0, y: 28 });
+      }
 
       // Reveal plays ONCE the first time the visitor scrolls (see onUpdate below)
       // and never reverses - it's a separate paused timeline, not scrub-linked, so
@@ -34,7 +41,7 @@ export default function Hero() {
       revealTl
         .to(lines, { yPercent: 0, duration: 0.5, ease: 'power4.out', stagger: 0.06 }, 0)
         .to(fades, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out', stagger: 0.06 }, 0.1);
-      let revealed = false;
+      let revealed = touch;
       const hint = el.querySelector<HTMLElement>('[data-hint]');
 
       // Pin + dive - still fully scrubbed/reversible.

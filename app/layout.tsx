@@ -1,6 +1,15 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
+
+// `viewport-fit=cover` so 100svh sections and safe-area insets behave on
+// notched devices.
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+  themeColor: '#080808',
+};
 
 // Geist (variable) - futuristic, highly readable. One cohesive system:
 // sans drives both display + body, mono drives the terminal/labels.

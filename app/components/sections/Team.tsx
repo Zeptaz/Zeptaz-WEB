@@ -46,57 +46,68 @@ export default function Team() {
             </Reveal>
           </div>
 
-          {/* circular portraits - hover reveals name + socials */}
-          <Reveal stagger={0.08} className="grid grid-cols-2 gap-6 sm:gap-8">
+          {/* Portraits. On sm+ the overlay reveals the detail on hover; below sm
+              the circle is far too small to hold a bio, so the same content is
+              laid out under the portrait instead of being hidden. */}
+          <Reveal stagger={0.08} className="grid grid-cols-1 gap-10 sm:grid-cols-2 sm:gap-8">
             {TEAM.map((m) => {
               const isOpen = open === m.name;
-              return (
-              <div
-                key={m.name}
-                onClick={(e) => {
-                  if ((e.target as HTMLElement).closest('a')) return;
-                  setOpen(isOpen ? null : m.name);
-                }}
-                className="group relative aspect-square w-full overflow-hidden rounded-full ring-1 ring-ink-border"
-                style={{ backgroundColor: m.panel }}
-              >
-                <Image
-                  src={m.photo}
-                  alt={m.name}
-                  fill
-                  sizes="(max-width: 1024px) 45vw, 32vw"
-                  className={cn(
-                    'object-contain object-bottom mix-blend-luminosity opacity-90 grayscale transition-all duration-500 group-hover:mix-blend-normal group-hover:grayscale-0 group-hover:scale-[1.03]',
-                    isOpen && 'mix-blend-normal grayscale-0 scale-[1.03]',
+              const socials = m.social && (
+                <>
+                  {m.social.linkedin && (
+                    <a href={m.social.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${m.name} on LinkedIn`}
+                      className="flex h-11 w-11 items-center justify-center rounded-full border border-ink-border-strong text-ink-secondary transition-colors hover:border-crimson hover:text-crimson sm:h-9 sm:w-9 sm:border-white/25 sm:text-paper/80">
+                      <LinkedinIcon />
+                    </a>
                   )}
-                />
+                  {m.social.instagram && (
+                    <a href={m.social.instagram} target="_blank" rel="noopener noreferrer" aria-label={`${m.name} on Instagram`}
+                      className="flex h-11 w-11 items-center justify-center rounded-full border border-ink-border-strong text-ink-secondary transition-colors hover:border-crimson hover:text-crimson sm:h-9 sm:w-9 sm:border-white/25 sm:text-paper/80">
+                      <InstagramIcon />
+                    </a>
+                  )}
+                </>
+              );
 
-                {/* overlay - hover, keyboard focus, or tap */}
-                <div className={cn(
-                  'absolute inset-0 flex flex-col items-center justify-center gap-2 bg-ink/72 px-6 text-center opacity-0 backdrop-blur-[1px] transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100',
-                  isOpen && 'opacity-100',
-                )}>
-                  <div className="text-lg font-semibold text-paper">{m.name}</div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-crimson">{m.role}</div>
-                  {m.bio && (
-                    <p className="mt-1 hidden max-w-[26ch] text-[12px] leading-relaxed text-paper/75 sm:block">{m.bio}</p>
-                  )}
-                  {m.social && (
-                    <div className="mt-2 flex items-center gap-3">
-                      {m.social.linkedin && (
-                        <a href={m.social.linkedin} target="_blank" rel="noopener noreferrer" aria-label={`${m.name} on LinkedIn`}
-                          className="flex h-9 w-9 items-center justify-center rounded-full border border-white/25 text-paper/80 transition-colors hover:border-crimson hover:text-crimson">
-                          <LinkedinIcon />
-                        </a>
-                      )}
-                      {m.social.instagram && (
-                        <a href={m.social.instagram} target="_blank" rel="noopener noreferrer" aria-label={`${m.name} on Instagram`}
-                          className="flex h-9 w-9 items-center justify-center rounded-full border border-white/25 text-paper/80 transition-colors hover:border-crimson hover:text-crimson">
-                          <InstagramIcon />
-                        </a>
-                      )}
-                    </div>
-                  )}
+              return (
+              <div key={m.name} className="flex flex-col items-center sm:block">
+                <div
+                  onClick={(e) => {
+                    if ((e.target as HTMLElement).closest('a')) return;
+                    setOpen(isOpen ? null : m.name);
+                  }}
+                  className="group relative aspect-square w-full max-w-[240px] overflow-hidden rounded-full ring-1 ring-ink-border sm:max-w-none"
+                  style={{ backgroundColor: m.panel }}
+                >
+                  <Image
+                    src={m.photo}
+                    alt={m.name}
+                    fill
+                    sizes="(max-width: 640px) 240px, (max-width: 1024px) 45vw, 32vw"
+                    className={cn(
+                      'object-contain object-bottom mix-blend-luminosity opacity-90 grayscale transition-all duration-500 group-hover:mix-blend-normal group-hover:grayscale-0 group-hover:scale-[1.03]',
+                      isOpen && 'mix-blend-normal grayscale-0 scale-[1.03]',
+                    )}
+                  />
+
+                  {/* overlay - sm+ only (hover / keyboard focus / tap) */}
+                  <div className={cn(
+                    'absolute inset-0 hidden flex-col items-center justify-center gap-2 bg-ink/72 px-6 text-center opacity-0 backdrop-blur-[1px] transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100 sm:flex',
+                    isOpen && 'opacity-100',
+                  )}>
+                    <div className="text-lg font-semibold text-paper">{m.name}</div>
+                    <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-crimson">{m.role}</div>
+                    {m.bio && <p className="mt-1 max-w-[26ch] text-[12px] leading-relaxed text-paper/75">{m.bio}</p>}
+                    {socials && <div className="mt-2 flex items-center gap-3">{socials}</div>}
+                  </div>
+                </div>
+
+                {/* mobile detail - the overlay content, laid out properly */}
+                <div className="mt-5 flex flex-col items-center text-center sm:hidden">
+                  <div className="text-lg font-semibold text-ink">{m.name}</div>
+                  <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-crimson">{m.role}</div>
+                  {m.bio && <p className="mt-3 max-w-[34ch] text-[13px] leading-relaxed text-ink-secondary">{m.bio}</p>}
+                  {socials && <div className="mt-4 flex items-center gap-3">{socials}</div>}
                 </div>
               </div>
               );

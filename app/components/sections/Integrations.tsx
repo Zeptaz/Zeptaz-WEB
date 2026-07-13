@@ -10,9 +10,11 @@ function Row({ items, reverse }: { items: string[]; reverse?: boolean }) {
   const seq = [...items, ...items];
   return (
     <div className="overflow-hidden">
-      {/* py-2 gives the hover lift room so the top border isn't clipped */}
+      {/* py-2 gives the hover lift room so the top border isn't clipped.
+          `active:` is the touch equivalent of the hover pause - press and hold
+          to stop the track, since a phone has no hover to pause with. */}
       <div
-        className={`marquee-track flex w-max items-center gap-4 py-2 hover:[animation-play-state:paused] ${
+        className={`marquee-track flex w-max items-center gap-4 py-2 hover:[animation-play-state:paused] active:[animation-play-state:paused] ${
           reverse ? '[animation-direction:reverse]' : ''
         }`}
       >

@@ -28,55 +28,93 @@ export default function TierManifest() {
         </div>
 
         <Reveal className="mt-12">
-          <div className="overflow-x-auto border border-border bg-[#050505]">
-            <div className="min-w-[640px] p-6 sm:p-8">
+          <div className="border border-border bg-[#050505]">
+            <div className="p-5 sm:p-8">
               {/* prompt line */}
               <div className="font-mono text-[12px] text-text-muted">
                 <span className="text-crimson">$</span> zeptaz build <span className="text-terminal-green">--manifest</span>
               </div>
 
-              {/* column headers */}
-              <div className="mt-6 grid grid-cols-[minmax(0,1fr)_repeat(3,88px)] items-baseline gap-x-2 border-b border-border pb-3">
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-faint">module</span>
-                {TIERS.map((t) => (
-                  <span key={t.id} className="text-center font-mono text-[10px] tracking-[0.18em] text-text-secondary">
-                    {t.label}
-                  </span>
-                ))}
+              {/* ── desktop: module × tier grid ──────────────────────────── */}
+              <div className="hidden lg:block">
+                <div className="mt-6 grid grid-cols-[minmax(0,1fr)_repeat(3,88px)] items-baseline gap-x-2 border-b border-border pb-3">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-faint">module</span>
+                  {TIERS.map((t) => (
+                    <span key={t.id} className="text-center font-mono text-[10px] tracking-[0.18em] text-text-secondary">
+                      {t.label}
+                    </span>
+                  ))}
+                </div>
+
+                <Reveal stagger={0.04}>
+                  {ENGINE_MODULES.map((m, i) => (
+                    <div
+                      key={m.id}
+                      className="grid grid-cols-[minmax(0,1fr)_repeat(3,88px)] items-center gap-x-2 border-b border-border/50 py-2.5"
+                    >
+                      <div className="flex min-w-0 items-baseline gap-3 font-mono text-[12px]">
+                        <span className="text-text-faint">{String(i + 1).padStart(2, '0')}</span>
+                        <span className="truncate text-text-secondary">{m.id.replace(/-/g, '_')}</span>
+                        <span className="truncate text-[11px] text-text-faint">— {m.name}</span>
+                        {m.flag === 'human' && <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-crimson">[human]</span>}
+                        {m.flag === 'alert' && <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-terminal-amber">[alert]</span>}
+                      </div>
+                      {TIERS.map((t) => {
+                        const on = m.tiers.includes(t.id);
+                        return (
+                          <span
+                            key={t.id}
+                            aria-label={on ? `Included in ${t.label}` : `Not in ${t.label}`}
+                            className={cn('text-center font-mono text-[13px]', on ? 'text-crimson' : 'text-text-faint/60')}
+                          >
+                            {on ? '■' : '·'}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </Reveal>
               </div>
 
-              {/* manifest lines */}
-              <Reveal stagger={0.04}>
-                {ENGINE_MODULES.map((m, i) => (
-                  <div
-                    key={m.id}
-                    className="grid grid-cols-[minmax(0,1fr)_repeat(3,88px)] items-center gap-x-2 border-b border-border/50 py-2.5"
-                  >
-                    <div className="flex min-w-0 items-baseline gap-3 font-mono text-[12px]">
-                      <span className="text-text-faint">{String(i + 1).padStart(2, '0')}</span>
-                      <span className="truncate text-text-secondary">{m.id.replace(/-/g, '_')}</span>
-                      <span className="hidden truncate text-[11px] text-text-faint sm:inline">— {m.name}</span>
-                      {m.flag === 'human' && <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-crimson">[human]</span>}
-                      {m.flag === 'alert' && <span className="font-mono text-[9px] uppercase tracking-[0.1em] text-terminal-amber">[alert]</span>}
+              {/* ── mobile: one block per module, tiers as chips ──────────
+                  A 3-column grid can't fit a readable module name on a phone,
+                  so the tiers move under the name instead of off-screen. */}
+              <div className="mt-6 lg:hidden">
+                <Reveal stagger={0.04}>
+                  {ENGINE_MODULES.map((m, i) => (
+                    <div key={m.id} className="border-b border-border/50 py-3.5 first:border-t first:border-border/50">
+                      <div className="flex items-baseline gap-2.5 font-mono text-[12px]">
+                        <span className="shrink-0 text-text-faint">{String(i + 1).padStart(2, '0')}</span>
+                        <span className="min-w-0 flex-1 text-text-secondary">{m.name}</span>
+                        {m.flag === 'human' && <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.1em] text-crimson">[human]</span>}
+                        {m.flag === 'alert' && <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.1em] text-terminal-amber">[alert]</span>}
+                      </div>
+                      <div className="mt-2.5 flex flex-wrap items-center gap-1.5 pl-[30px]">
+                        {TIERS.map((t) => {
+                          const on = m.tiers.includes(t.id);
+                          return (
+                            <span
+                              key={t.id}
+                              aria-label={on ? `Included in ${t.label}` : `Not in ${t.label}`}
+                              className={cn(
+                                'border px-2 py-1 font-mono text-[9px] uppercase tracking-[0.12em]',
+                                on
+                                  ? 'border-crimson/45 bg-crimson/10 text-crimson'
+                                  : 'border-border text-text-faint/70',
+                              )}
+                            >
+                              {t.label}
+                            </span>
+                          );
+                        })}
+                      </div>
                     </div>
-                    {TIERS.map((t) => {
-                      const on = m.tiers.includes(t.id);
-                      return (
-                        <span
-                          key={t.id}
-                          aria-label={on ? `Included in ${t.label}` : `Not in ${t.label}`}
-                          className={cn('text-center font-mono text-[13px]', on ? 'text-crimson' : 'text-text-faint/60')}
-                        >
-                          {on ? '■' : '·'}
-                        </span>
-                      );
-                    })}
-                  </div>
-                ))}
-              </Reveal>
+                  ))}
+                </Reveal>
+              </div>
 
               {/* footer */}
-              <div className="mt-5 font-mono text-[11px] text-text-muted">
+              <div className="mt-5 font-mono text-[11px] leading-relaxed text-text-muted">
                 <span className="text-terminal-green">ok</span> · tiers set <span className="text-crimson">reach, not composition</span> - load-bearing stations can’t be removed
               </div>
             </div>

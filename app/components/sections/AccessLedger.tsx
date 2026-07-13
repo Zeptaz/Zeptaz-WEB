@@ -34,8 +34,8 @@ export default function AccessLedger() {
         </div>
 
         <Reveal className="mt-12">
-          <div className="overflow-x-auto border border-border bg-[#050505]">
-            <div className="min-w-[560px] p-6 sm:p-8">
+          <div className="border border-border bg-[#050505]">
+            <div className="p-5 sm:p-8">
               <div className="font-mono text-[12px] text-text-muted">
                 <span className="text-crimson">$</span> zeptaz access <span className="text-terminal-green">--audit</span>
               </div>
@@ -43,13 +43,18 @@ export default function AccessLedger() {
               <Reveal stagger={0.07} className="mt-6">
                 {ENTRIES.map((e) => (
                   <div key={e.request} className="border-b border-border/50 py-4 last:border-b-0">
-                    <div className="flex items-baseline gap-3 font-mono text-[12px]">
-                      <span className="select-none text-text-faint">&gt;</span>
-                      <span className="text-text-secondary">{e.request}</span>
-                      <span className="mx-1 flex-1 border-b border-dotted border-border" aria-hidden />
+                    {/* The request/verdict line is one row only once there's width
+                        for it - below sm the verdict drops under the request
+                        rather than forcing the whole ledger to scroll sideways. */}
+                    <div className="flex flex-col gap-2 font-mono text-[12px] sm:flex-row sm:items-baseline sm:gap-3">
+                      <div className="flex min-w-0 items-baseline gap-3">
+                        <span className="select-none text-text-faint">&gt;</span>
+                        <span className="break-words text-text-secondary">{e.request}</span>
+                      </div>
+                      <span className="mx-1 hidden flex-1 border-b border-dotted border-border sm:block" aria-hidden />
                       <span
                         className={cn(
-                          'px-1.5 py-0.5 text-[10px] tracking-[0.14em]',
+                          'ml-6 w-fit shrink-0 px-1.5 py-0.5 text-[10px] tracking-[0.14em] sm:ml-0',
                           e.verdict === 'DENIED' ? 'bg-crimson/12 text-crimson' : 'bg-terminal-green/10 text-terminal-green',
                         )}
                       >
@@ -64,7 +69,7 @@ export default function AccessLedger() {
                 ))}
               </Reveal>
 
-              <div className="mt-5 font-mono text-[11px] text-text-muted">
+              <div className="mt-5 font-mono text-[11px] leading-relaxed text-text-muted">
                 <span className="text-terminal-green">ok</span> · least-privilege by default - the system can’t leak what it never had
               </div>
             </div>

@@ -2,11 +2,12 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { ScrollTrigger, prefersReducedMotion } from '@/lib/gsap';
-import { ENGINE_MODULES } from '@/lib/constants';
+import { ENGINE_MODULES, type EngineModule } from '@/lib/constants';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import Eyebrow from '@/components/ui/Eyebrow';
 import Reveal from '@/components/ui/Reveal';
 import FlagBadge from '@/components/ui/FlagBadge';
+import SwipeDeck from '@/components/ui/SwipeDeck';
 import AsciiWall, { type AsciiWallHandle } from '@/components/ui/AsciiWall';
 
 // 3D tunnel is desktop-only and client-only - keep the three.js stack out of
@@ -15,6 +16,55 @@ const EngineTunnel = dynamic(() => import('@/components/ui/EngineTunnel'), { ssr
 
 // Keep in sync with ADVANCE in EngineTunnel.tsx (auto-advance seconds per module).
 const ADVANCE_MS = 2700;
+
+/**
+ * One module as a full mobile card. The desktop tunnel communicates the
+ * dependency chain visually; a card stack throws that away, so the "depends on"
+ * footer carries the section's actual argument (locked chain, not a menu).
+ */
+function ModuleCard({ module: m, index: i }: { module: EngineModule; index: number }) {
+  const Icon = m.icon;
+  const prev = i > 0 ? ENGINE_MODULES[i - 1] : null;
+  const no = String(i + 1).padStart(2, '0');
+
+  return (
+    <article className="relative flex h-full flex-col overflow-hidden border border-border bg-bg-subtle/80 p-6 backdrop-blur-sm">
+      <span aria-hidden className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-crimson via-crimson/30 to-transparent" />
+      <span
+        aria-hidden
+        className="display-stat pointer-events-none absolute -top-4 right-1 select-none text-[96px] text-text-primary/[0.045]"
+      >
+        {no}
+      </span>
+
+      <span className="relative flex h-12 w-12 items-center justify-center border border-border-strong bg-bg-primary/60 text-crimson">
+        <Icon className="h-[22px] w-[22px]" strokeWidth={1.4} />
+      </span>
+
+      <h3 className="relative mt-6 text-[17px] font-semibold tracking-[-0.01em] text-text-primary">{m.name}</h3>
+      <p className="relative mt-2 text-[13px] leading-relaxed text-text-muted">{m.desc}</p>
+
+      {m.flag && (
+        <div className="relative mt-4">
+          <FlagBadge flag={m.flag} />
+        </div>
+      )}
+
+      <div className="relative mt-auto border-t border-border/70 pt-4 font-mono text-[10px] uppercase tracking-[0.12em] text-text-faint">
+        {prev ? (
+          <>
+            depends on{' '}
+            <span className="text-text-secondary">
+              {String(i).padStart(2, '0')} {prev.id.replace(/-/g, '_')}
+            </span>
+          </>
+        ) : (
+          <>entry point - nothing upstream</>
+        )}
+      </div>
+    </article>
+  );
+}
 
 export default function Engine() {
   const root = useRef<HTMLElement>(null);
@@ -160,7 +210,9 @@ export default function Engine() {
         {/* Both layouts are CSS-gated so the desktop column reserves its space
             immediately (no post-hydration pop-in); only the heavy canvas
             itself waits for the JS media query. */}
-        <div className="relative">
+        {/* min-w-0: a grid item defaults to min-width:auto, which lets the deck's
+            slides size the column instead of the column constraining the deck. */}
+        <div className="relative min-w-0">
           <div className="relative hidden h-[64vh] min-h-[420px] w-full overflow-hidden border border-border/60 lg:block">
             {/* ASCII wall backdrop - the tunnel flies through it */}
             <AsciiWall ref={wall} className="absolute inset-0 h-full w-full opacity-55" />
@@ -180,33 +232,14 @@ export default function Engine() {
             </div>
           </div>
 
-          <ul className="flex flex-col gap-3 lg:hidden">
-            {ENGINE_MODULES.map((m, i) => {
-              const Icon = m.icon;
-              return (
-                <li
-                  key={m.id}
-                  className="relative border border-border bg-bg-subtle/80 p-4 backdrop-blur-sm"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="flex h-8 w-8 items-center justify-center border border-border-strong text-text-secondary">
-                      <Icon className="h-4 w-4" strokeWidth={1.6} />
-                    </span>
-                    <span className="font-mono text-[10px] tracking-[0.16em] text-text-faint">
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
-                  </div>
-                  <div className="mt-3 text-[13px] font-semibold text-text-primary">{m.name}</div>
-                  <p className="mt-1 text-[11px] leading-relaxed text-text-muted">{m.desc}</p>
-                  {m.flag && (
-                    <div className="mt-2.5">
-                      <FlagBadge flag={m.flag} />
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+          <SwipeDeck
+            className="lg:hidden"
+            label="Engine modules"
+            items={ENGINE_MODULES}
+            getKey={(m) => m.id}
+            slideLabel={(m, i) => `Module ${i + 1} of ${ENGINE_MODULES.length}: ${m.name}`}
+            renderItem={(m, i) => <ModuleCard module={m} index={i} />}
+          />
         </div>
       </div>
 

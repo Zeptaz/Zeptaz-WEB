@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Check } from 'lucide-react';
 import { SERVICES } from '@/lib/constants';
 import { cn } from '@/lib/utils';
@@ -18,7 +18,9 @@ import { lenisScrollTo } from '@/components/layout/SmoothScroll';
 function TraceLine({ line }: { line: string }) {
   const m = line.match(/^(.*?)(\[[^\]]+\])?$/);
   return (
-    <div className="whitespace-nowrap font-mono text-[12px] leading-7 text-terminal-green/85">
+    // Wrap on mobile: five nowrap terminals meant five horizontal scrollers on
+    // a phone. Only hold the single-line look once there's room for it.
+    <div className="break-words font-mono text-[11.5px] leading-6 text-terminal-green/85 sm:text-[12px] lg:whitespace-nowrap lg:leading-7">
       <span className="text-ink-muted/70 select-none">&gt; </span>
       {m?.[1]}
       {m?.[2] && <span className="text-crimson">{m[2]}</span>}
@@ -28,6 +30,18 @@ function TraceLine({ line }: { line: string }) {
 
 export default function ServiceDeep() {
   const [active, setActive] = useState(SERVICES[0].slug);
+  const chips = useRef<HTMLElement>(null);
+
+  // Keep the active chip in view on the mobile index without scrolling the page.
+  useEffect(() => {
+    const nav = chips.current;
+    const chip = nav?.querySelector<HTMLElement>(`[data-chip="${active}"]`);
+    if (!nav || !chip) return;
+    nav.scrollTo({
+      left: chip.offsetLeft - (nav.clientWidth - chip.offsetWidth) / 2,
+      behavior: 'smooth',
+    });
+  }, [active]);
 
   // Scroll-spy: highlight the system currently in view on the rail.
   useEffect(() => {
@@ -57,6 +71,36 @@ export default function ServiceDeep() {
             Every system below is the same engine pointed at a different workflow. For each one: what you walk away with, what a single run looks like, and the operational outcome it exists for.
           </Reveal>
         </div>
+
+        {/* Mobile index. The sticky rail below is lg-only, which left phones with
+            no way to see - let alone jump between - the five systems. */}
+        <nav
+          aria-label="Systems"
+          ref={chips}
+          data-lenis-prevent
+          className="sticky top-16 z-30 -mx-5 mt-10 flex gap-2 overflow-x-auto border-y border-ink-border bg-paper/95 px-5 py-3 backdrop-blur-sm [scrollbar-width:none] sm:-mx-8 sm:px-8 lg:hidden [&::-webkit-scrollbar]:hidden"
+        >
+          {SERVICES.map((s, i) => {
+            const on = active === s.slug;
+            return (
+              <a
+                key={s.slug}
+                data-chip={s.slug}
+                href={`#${s.slug}`}
+                onClick={(e) => { e.preventDefault(); lenisScrollTo(`#${s.slug}`, -128); }}
+                className={cn(
+                  'flex shrink-0 items-center gap-2 border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.1em] transition-colors',
+                  on ? 'border-crimson bg-crimson/10 text-crimson' : 'border-ink-border text-ink-muted',
+                )}
+              >
+                <span className={cn('text-[9px]', on ? 'text-crimson' : 'text-ink-muted/70')}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                {s.short}
+              </a>
+            );
+          })}
+        </nav>
 
         <div className="mt-14 grid gap-10 lg:grid-cols-[200px_minmax(0,1fr)] lg:gap-14">
           {/* sticky rail */}
@@ -93,7 +137,8 @@ export default function ServiceDeep() {
                 <article
                   key={s.slug}
                   id={s.slug}
-                  className={cn('scroll-mt-24 py-14', i > 0 && 'border-t border-ink-border')}
+                  // extra offset on mobile clears the sticky chip index
+                  className={cn('scroll-mt-36 py-14 lg:scroll-mt-24', i > 0 && 'border-t border-ink-border')}
                 >
                   <Reveal className="grid gap-8 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,0.75fr)] lg:items-start">
                     <div>
@@ -125,12 +170,12 @@ export default function ServiceDeep() {
 
                     {/* right: illustration + one run as a terminal trace */}
                     <div className="flex flex-col gap-5">
-                      <div className="hidden justify-center border border-ink-border bg-paper-2 p-6 sm:flex">
+                      <div className="flex justify-center border border-ink-border bg-paper-2 p-6">
                         <div className="w-full max-w-[260px]">
                           <IsoArt variant={s.slug} />
                         </div>
                       </div>
-                      <div className="overflow-x-auto border border-ink-border bg-[#0A0A0A] p-5">
+                      <div data-lenis-prevent className="overflow-x-auto border border-ink-border bg-[#0A0A0A] p-5">
                         <div className="mono-meta mb-3 flex items-center gap-2 text-text-faint">
                           <span className="h-1.5 w-1.5 bg-terminal-green" /> one run
                         </div>

@@ -332,6 +332,13 @@ body {
   -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
   mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
 }
+/* On a narrow viewport an 8% fade is only ~30px, so logos pop in and out. */
+@media (max-width: 639px) {
+  .marquee-mask {
+    -webkit-mask-image: linear-gradient(to right, transparent, black 14%, black 86%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 14%, black 86%, transparent);
+  }
+}
 
 /* ─── Horizontal logo marquee ───────────────────────────────────────── */
 @keyframes marquee-x {
@@ -341,6 +348,11 @@ body {
 .marquee-track {
   animation: marquee-x var(--marquee-dur, 40s) linear infinite;
   will-change: transform;
+}
+/* The track length is fixed, so a fixed duration whips past a 375px window far
+   faster than it drifts across a desktop one. Slow it down to match. */
+@media (max-width: 639px) {
+  .marquee-track { --marquee-dur: 70s; }
 }
 @media (prefers-reduced-motion: reduce) {
   .marquee-track { animation: none; }
