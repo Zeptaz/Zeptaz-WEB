@@ -11,7 +11,7 @@ export default function PageHero({
   lead,
   tone = 'dark',
 }: {
-  eyebrow: string;
+  eyebrow?: string;
   title: React.ReactNode;
   lead: string;
   tone?: 'dark' | 'light';
@@ -27,10 +27,10 @@ export default function PageHero({
     >
       <div
         className="pointer-events-none absolute inset-0"
-        style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 20%, rgba(220,20,60,0.08), transparent 60%)' }}
+        style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 20%, rgb(220 20 60 / calc(0.08 * var(--glow-strength))), transparent 60%)' }}
       />
       <div className="section-shell relative">
-        <Eyebrow tone={tone} className="mb-6">{eyebrow}</Eyebrow>
+        {eyebrow && <Eyebrow tone={tone} className="mb-6">{eyebrow}</Eyebrow>}
         <Reveal as="h1" className={cn('display-hero max-w-[18ch]', light ? 'text-ink' : 'text-text-primary')}>
           {title}
         </Reveal>

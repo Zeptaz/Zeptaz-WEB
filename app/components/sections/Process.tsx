@@ -85,7 +85,7 @@ export default function Process() {
         {/* ── console: stage + rail ─────────────────────────────────────── */}
         <div className="mt-[clamp(1.25rem,3vh,2.25rem)] grid gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-stretch">
           {/* STAGE */}
-          <div className="relative flex min-h-[360px] flex-col border border-ink-border bg-paper-2/40 p-7 sm:p-8">
+          <div className="relative flex min-h-[360px] flex-col border border-ink-border bg-paper-2/40 p-5 sm:p-8">
             <div key={active} className="animate-engine-fade flex flex-1 flex-col">
               <div className="flex items-center justify-between">
                 <span className="font-mono text-[12px] tracking-[0.18em] text-ink-muted">
@@ -119,7 +119,7 @@ export default function Process() {
 
               {/* terminal readout */}
               <div className="mt-auto pt-7">
-                <div className="border border-ink-border bg-[#0C0C0C] px-5 py-4 font-mono text-[13px] leading-relaxed text-[#E9E6DF]/90" aria-hidden>
+                <div className="border border-ink-border bg-[#0C0C0C] px-4 py-4 font-mono text-[11.5px] leading-relaxed break-words text-[#E9E6DF]/90 sm:px-5 sm:text-[13px]" aria-hidden>
                   {step.logs.map((l, i) => (
                     <div key={`${active}-${i}`} className="process-line" style={{ animationDelay: `${i * 0.1 + 0.1}s` }}>
                       <span className="text-crimson">{l.startsWith('>') ? '' : '· '}</span>

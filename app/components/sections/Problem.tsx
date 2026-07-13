@@ -118,7 +118,7 @@ export default function Problem() {
       <section id="problem" data-nav="dark" ref={root} className="relative z-10 -mt-[100svh] overflow-hidden">
         <div ref={pinWrap} className="relative h-[100svh] overflow-hidden">
           <div ref={stage} className="absolute inset-0 flex flex-col justify-center bg-bg-primary">
-            <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 25%, rgba(220,20,60,0.06), transparent 60%)' }} />
+            <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 25%, rgb(220 20 60 / calc(0.06 * var(--glow-strength))), transparent 60%)' }} />
             {content}
           </div>
         </div>
@@ -128,7 +128,7 @@ export default function Problem() {
 
   return (
     <section id="problem" data-nav="dark" ref={root} className="section-dark section-screen relative overflow-hidden border-t border-border">
-      <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 25%, rgba(220,20,60,0.06), transparent 60%)' }} />
+      <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 25%, rgb(220 20 60 / calc(0.06 * var(--glow-strength))), transparent 60%)' }} />
       {content}
     </section>
   );

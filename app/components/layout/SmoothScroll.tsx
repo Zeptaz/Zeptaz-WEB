@@ -27,6 +27,9 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
       smoothWheel: !reducedMotion,
       wheelMultiplier: 1,
       touchMultiplier: 1.4,
+      // Blog code blocks scroll horizontally but are rendered from sanitized
+      // HTML, so they can't carry a `data-lenis-prevent` attribute of their own.
+      prevent: (node) => node.nodeName === 'PRE',
     });
 
     // expose for in-app anchor scrolling
@@ -52,9 +55,13 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     // NOT snap targets - they own scroll-driven timelines (the hero reveal +
     // zoom-pull, the problem keyword narrative, the engine draw). Snapping to the
     // following section still cleanly "snaps out" of the pin.
+    // Snapping is also skipped on touch: combined with 100svh sections it makes
+    // a phone's momentum scroll feel like it's being grabbed away.
+    const coarse = window.matchMedia('(pointer: coarse)').matches;
+
     let snap: Snap | undefined;
     const snapTimer = setTimeout(() => {
-      if (reducedMotion) return;
+      if (reducedMotion || coarse) return;
       snap = new Snap(lenis, {
         type: 'proximity',
         // Soft, low-intensity settle (lerp << 1 = smooth, gentle glide).

@@ -23,12 +23,22 @@ export default function Preloader() {
       setDone(true);
     };
 
+    // The splash scroll-locks the page while it plays. A ~2.7s hold is a long
+    // time to hold a phone still, so the dwell is cut short on touch.
+    const coarse = window.matchMedia('(pointer: coarse)').matches;
+
     const tl = gsap.timeline({ onComplete: finish });
     if (reduce) {
       tl.to(root.current, { opacity: 0, duration: 0.4, delay: 0.6, ease: 'power1.out' });
     } else {
       // hold, then fly the "camera" into the T (stem ≈ 58% / 50% of the wordmark)
-      tl.to(mark.current, { scale: 32, duration: 1.1, ease: 'power2.in', transformOrigin: '58% 50%', delay: 1.6 }, 0)
+      tl.to(mark.current, {
+        scale: 32,
+        duration: coarse ? 0.85 : 1.1,
+        ease: 'power2.in',
+        transformOrigin: '58% 50%',
+        delay: coarse ? 0.75 : 1.6,
+      }, 0)
         .to(root.current, { opacity: 0, duration: 0.45, ease: 'power2.in' }, '-=0.4');
     }
 

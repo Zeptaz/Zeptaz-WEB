@@ -64,7 +64,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <section data-nav="dark" className="section-dark relative border-b border-border pb-24 pt-32">
         <div
           className="pointer-events-none absolute inset-0"
-          style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(220,20,60,0.07), transparent 60%)' }}
+          style={{ background: 'radial-gradient(ellipse 70% 50% at 50% 0%, rgb(220 20 60 / calc(0.07 * var(--glow-strength))), transparent 60%)' }}
         />
         <div className="section-shell relative">
           <PostArticle post={post} />

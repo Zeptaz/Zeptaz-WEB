@@ -1,4 +1,5 @@
 'use client';
+import { cn } from '@/lib/utils';
 
 /* Hero backdrop - reused & refined from V1: dot grid + crimson glow +
    scrolling workflow logs (re-themed to the new positioning). */
@@ -75,13 +76,13 @@ const netLogs = [
   '> heartbeat [11ms] seq:8822',
 ];
 
-function Pane({ lines, duration }: { lines: string[]; duration: string }) {
+function Pane({ lines, duration, className }: { lines: string[]; duration: string; className?: string }) {
   const doubled = [...lines, ...lines];
   return (
-    <div className="min-w-0 flex-1 overflow-hidden">
+    <div className={cn('min-w-0 flex-1 overflow-hidden', className)}>
       <div className="terminal-pane flex flex-col gap-[6px]" style={{ '--scroll-duration': duration } as React.CSSProperties}>
         {doubled.map((line, i) => (
-          <div key={i} className="whitespace-nowrap font-mono text-[11px] leading-[1.6] text-emerald-400/90" style={{ letterSpacing: '0.02em' }}>
+          <div key={i} className="whitespace-nowrap font-mono text-[10px] leading-[1.6] text-emerald-400/90 sm:text-[11px]" style={{ letterSpacing: '0.02em' }}>
             {line}
           </div>
         ))}
@@ -96,13 +97,14 @@ export default function TerminalBackdrop() {
       {/* dot grid */}
       <div className="absolute inset-0 dot-grid" />
       {/* crimson radial glow */}
-      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 72% 48% at 50% 100%, rgba(220,20,60,0.12), transparent 64%)' }} />
-      {/* scrolling panes */}
-      <div className="absolute inset-0 hidden gap-7 px-7 pt-24 lg:flex" style={{ opacity: 0.12 }}>
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 72% 48% at 50% 100%, rgb(220 20 60 / calc(0.12 * var(--glow-strength))), transparent 64%)' }} />
+      {/* Scrolling panes. Mobile shows fewer (a 375px viewport can't hold four
+          columns of mono log) but never zero - this is the hero's texture. */}
+      <div className="absolute inset-0 flex gap-5 px-5 pt-24 sm:gap-7 sm:px-7" style={{ opacity: 0.12 }}>
         <Pane lines={intakeLogs} duration="30s" />
-        <Pane lines={ruleLogs} duration="24s" />
-        <Pane lines={statusLogs} duration="34s" />
-        <Pane lines={netLogs} duration="27s" />
+        <Pane lines={ruleLogs} duration="24s" className="hidden sm:block" />
+        <Pane lines={statusLogs} duration="34s" className="hidden lg:block" />
+        <Pane lines={netLogs} duration="27s" className="hidden lg:block" />
       </div>
       {/* edge fades */}
       <div className="absolute inset-x-0 top-0 h-28" style={{ background: 'linear-gradient(to bottom, #080808, transparent)' }} />

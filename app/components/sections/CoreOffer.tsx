@@ -8,7 +8,7 @@ import ParticleSphere from '@/components/illustrations/ParticleSphere';
 export default function CoreOffer() {
   return (
     <section id="offer" data-nav="dark" className="section-dark section-screen relative overflow-hidden border-t border-border">
-      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 60% 50% at 80% 50%, rgba(220,20,60,0.07), transparent 60%)' }} />
+      <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse 60% 50% at 80% 50%, rgb(220 20 60 / calc(0.07 * var(--glow-strength))), transparent 60%)' }} />
       <div className="section-shell relative">
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
           {/* Left copy */}

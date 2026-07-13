@@ -46,7 +46,11 @@ const AsciiWall = forwardRef<
     if (!ctx) return;
 
     const reduce = prefersReducedMotion();
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    // Phones run this full-screen canvas in the hero AND the footer, so cap the
+    // work: half the frame rate, and a coarser grid (see `cell` below).
+    const coarse = window.matchMedia('(pointer: coarse)').matches;
+    const frameMs = coarse ? 1000 / 30 : 0;
+    const dpr = Math.min(window.devicePixelRatio || 1, coarse ? 1.25 : 1.5);
     const baseRGB = tone === 'light' ? '12,12,12' : '255,255,255';
     // brighter characters + stronger crimson when `vivid` (used by the loader)
     const A = vivid
@@ -60,7 +64,9 @@ const AsciiWall = forwardRef<
     const build = () => {
       const rect = canvas.getBoundingClientRect();
       w = rect.width; h = rect.height;
-      cell = w < 640 ? 13 : 18;
+      // A 13px cell on a narrow-but-tall phone canvas meant ~2x the cells of an
+      // 18px desktop grid - the small screen was doing the most work.
+      cell = w < 640 ? 16 : 18;
       canvas.width = Math.max(1, Math.floor(w * dpr));
       canvas.height = Math.max(1, Math.floor(h * dpr));
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -159,9 +165,16 @@ const AsciiWall = forwardRef<
       ctx.globalAlpha = 1;
     };
 
-    const draw = () => {
+    let last = 0;
+    const draw = (now = 0) => {
       raf = visible && !reduce ? requestAnimationFrame(draw) : 0;
-      t += 0.016;
+      // Touch: render every other frame. `t` advances by the real elapsed step
+      // so the drift wave keeps the same speed at the lower frame rate.
+      if (frameMs) {
+        if (now - last < frameMs) return;
+        last = now;
+      }
+      t += frameMs ? 0.032 : 0.016;
       diveSmooth += (diveRef.current - diveSmooth) * 0.07;
 
       // pulse: instant attack (from pulse()), smooth decay
