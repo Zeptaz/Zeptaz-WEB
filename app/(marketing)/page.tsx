@@ -1,6 +1,7 @@
 import Hero from '@/components/sections/Hero';
 import Problem from '@/components/sections/Problem';
 import ServiceCategories from '@/components/sections/ServiceCategories';
+import VoiceProduct from '@/components/sections/VoiceProduct';
 import Engine from '@/components/sections/Engine';
 import Differentiators from '@/components/sections/Differentiators';
 import Integrations from '@/components/sections/Integrations';
@@ -15,6 +16,7 @@ export default function Home() {
       <Hero />
       <Problem />
       <ServiceCategories />
+      <VoiceProduct />
       <Engine />
       <Differentiators />
       <Integrations />
