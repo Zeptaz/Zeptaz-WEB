@@ -23,6 +23,7 @@ export const SITE = {
 
 export const NAV_LINKS = [
   { label: 'Services', href: '/services' },
+  { label: 'Voice', href: '/products/voice-agent' },
   { label: 'Engine', href: '/engine' },
   { label: 'Process', href: '/process' },
   { label: 'Pricing', href: '/pricing' },
