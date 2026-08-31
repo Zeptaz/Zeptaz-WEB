@@ -48,8 +48,8 @@ export interface VoiceScenario {
   business: string;
   type: string;
   language: string;
-  /** BCP-47 locale handed to the voice backend as `lang`. */
-  locale: string;
+  /** Validated language code sent to the protected demo-session endpoint. */
+  languageCode: 'auto' | 'en' | 'si' | 'ta';
   prompt: string;
 }
 export const VOICE_SCENARIOS: VoiceScenario[] = [
@@ -60,7 +60,7 @@ export const VOICE_SCENARIOS: VoiceScenario[] = [
     business: 'zepStay',
     type: 'Boutique hotel',
     language: 'English',
-    locale: 'en-LK',
+    languageCode: 'en',
     prompt: 'Ask about check-in times, parking, room facilities, or hotel policies.',
   },
   {
@@ -70,7 +70,7 @@ export const VOICE_SCENARIOS: VoiceScenario[] = [
     business: 'zepCare',
     type: 'Dental clinic',
     language: 'Tamil',
-    locale: 'ta-LK',
+    languageCode: 'ta',
     prompt: 'Ask for an available dental consultation tomorrow afternoon.',
   },
   {
@@ -80,7 +80,7 @@ export const VOICE_SCENARIOS: VoiceScenario[] = [
     business: 'zepFoods',
     type: 'Restaurant',
     language: 'Sinhala + English',
-    locale: 'si-LK',
+    languageCode: 'si',
     prompt: 'Order a meal, choose delivery or pickup, and confirm the details.',
   },
 ];

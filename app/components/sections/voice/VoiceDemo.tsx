@@ -168,8 +168,9 @@ export default function VoiceDemo() {
           </div>
 
           {/* footnote */}
-          <p className="border-t border-border px-5 py-3 font-mono text-[10px] uppercase tracking-[0.14em] text-text-faint">
-            Demo businesses · Calls are not recorded · Best in Chrome, Edge, or Safari 15+
+          <p className="border-t border-border px-5 py-3 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-text-faint">
+            Demo businesses · Audio is processed live by Google Gemini and is not stored as a recording ·
+            Transcripts and personal details are deleted when the session ends · Please use sample information only
           </p>
         </div>
       </div>
