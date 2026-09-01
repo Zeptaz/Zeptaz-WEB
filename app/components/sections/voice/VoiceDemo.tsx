@@ -1,7 +1,13 @@
 'use client';
 import { useState } from 'react';
 import { Mic, Square, LoaderCircle, PhoneOff } from 'lucide-react';
-import { VOICE, VOICE_SCENARIOS, type VoiceScenario } from '@/lib/voice';
+import {
+  VOICE,
+  VOICE_LANGUAGE_OPTIONS,
+  VOICE_SCENARIOS,
+  type VoiceLanguageCode,
+  type VoiceScenario,
+} from '@/lib/voice';
 import { cn } from '@/lib/utils';
 import { useVoiceSession } from '@/hooks/useVoiceSession';
 import Button from '@/components/ui/Button';
@@ -12,11 +18,14 @@ import VoiceVisualizer from './VoiceVisualizer';
 
 export default function VoiceDemo() {
   const [scenario, setScenario] = useState<VoiceScenario>(VOICE_SCENARIOS[0]);
+  const [language, setLanguage] = useState<VoiceLanguageCode>('auto');
   const { state, status, active, analyser, start, stop } = useVoiceSession();
 
   const live = state === 'live';
   const busy = state === 'connecting' || state === 'waiting';
   const offline = state === 'unconfigured';
+  const selectedLanguage = VOICE_LANGUAGE_OPTIONS.find((option) => option.value === language)
+    ?? VOICE_LANGUAGE_OPTIONS[0];
 
   // Changing the business mid-call ends the current session first - the
   // backend is configured per scenario at connect time.
@@ -45,13 +54,31 @@ export default function VoiceDemo() {
         </div>
 
         {/* language support */}
-        <div className="mt-10 flex flex-wrap items-center gap-x-3 gap-y-2 border-y border-border py-3">
-          <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-crimson">
-            Language support
-          </span>
-          <span className="font-mono text-[12px] uppercase tracking-[0.1em] text-text-muted">
-            {VOICE.languages.join(' · ')}
-          </span>
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-y border-border py-3">
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-crimson">
+              Language support
+            </span>
+            <span className="font-mono text-[12px] uppercase tracking-[0.1em] text-text-muted">
+              {VOICE.languages.join(' · ')}
+            </span>
+          </div>
+          <label className="flex items-center gap-3">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">
+              Call language
+            </span>
+            <select
+              value={language}
+              onChange={(event) => setLanguage(event.target.value as VoiceLanguageCode)}
+              disabled={active}
+              aria-label="Voice preview language"
+              className="min-w-40 border border-border-strong bg-bg-primary px-3 py-2 font-mono text-[11px] uppercase tracking-[0.12em] text-text-primary focus:border-crimson focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {VOICE_LANGUAGE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
         </div>
 
         {/* scenario tabs */}
@@ -94,7 +121,7 @@ export default function VoiceDemo() {
               Voice preview
             </span>
             <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-crimson">
-              {scenario.language}
+              {selectedLanguage.label}
             </span>
           </div>
 
@@ -131,7 +158,7 @@ export default function VoiceDemo() {
                 <>
                   <button
                     type="button"
-                    onClick={() => (active ? stop() : start(scenario))}
+                    onClick={() => (active ? stop() : start(scenario, language))}
                     aria-pressed={active}
                     aria-label={active ? 'End the voice preview call' : 'Start the voice preview call'}
                     className={cn(
@@ -168,8 +195,9 @@ export default function VoiceDemo() {
           </div>
 
           {/* footnote */}
-          <p className="border-t border-border px-5 py-3 font-mono text-[10px] uppercase tracking-[0.14em] text-text-faint">
-            Demo businesses · Calls are not recorded · Best in Chrome, Edge, or Safari 15+
+          <p className="border-t border-border px-5 py-3 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-text-faint">
+            Demo businesses · Audio is processed live by Google Gemini and is not stored as a recording ·
+            Transcripts and personal details are deleted when the session ends · Please use sample information only
           </p>
         </div>
       </div>

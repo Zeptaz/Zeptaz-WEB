@@ -26,6 +26,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://zeptaz.com'),
   title: 'Zeptaz - AI Workflow Automation for Service Businesses',
   description:
     'Zeptaz builds reliable AI workflow automation systems that connect your forms, inboxes, CRM/ATS, alerts, AI-assisted drafts, follow-ups, and reporting - so important work never gets stuck between tools.',

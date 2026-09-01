@@ -47,11 +47,17 @@ export interface VoiceScenario {
   tab: string;
   business: string;
   type: string;
-  language: string;
-  /** BCP-47 locale handed to the voice backend as `lang`. */
-  locale: string;
   prompt: string;
 }
+
+export type VoiceLanguageCode = 'auto' | 'en' | 'si' | 'ta';
+
+export const VOICE_LANGUAGE_OPTIONS: ReadonlyArray<{ value: VoiceLanguageCode; label: string }> = [
+  { value: 'auto', label: 'Auto detect' },
+  { value: 'en', label: 'English' },
+  { value: 'si', label: 'Sinhala' },
+  { value: 'ta', label: 'Tamil' },
+];
 export const VOICE_SCENARIOS: VoiceScenario[] = [
   {
     id: 'question',
@@ -59,8 +65,6 @@ export const VOICE_SCENARIOS: VoiceScenario[] = [
     tab: 'Ask a Question',
     business: 'zepStay',
     type: 'Boutique hotel',
-    language: 'English',
-    locale: 'en-LK',
     prompt: 'Ask about check-in times, parking, room facilities, or hotel policies.',
   },
   {
@@ -69,8 +73,6 @@ export const VOICE_SCENARIOS: VoiceScenario[] = [
     tab: 'Book an Appointment',
     business: 'zepCare',
     type: 'Dental clinic',
-    language: 'Tamil',
-    locale: 'ta-LK',
     prompt: 'Ask for an available dental consultation tomorrow afternoon.',
   },
   {
@@ -79,8 +81,6 @@ export const VOICE_SCENARIOS: VoiceScenario[] = [
     tab: 'Place an Order',
     business: 'zepFoods',
     type: 'Restaurant',
-    language: 'Sinhala + English',
-    locale: 'si-LK',
     prompt: 'Order a meal, choose delivery or pickup, and confirm the details.',
   },
 ];

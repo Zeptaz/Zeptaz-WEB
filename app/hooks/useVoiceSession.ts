@@ -1,31 +1,15 @@
 'use client';
+
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { VoiceScenario } from '@/lib/voice';
+import type { VoiceLanguageCode, VoiceScenario } from '@/lib/voice';
+import { VoicePlaybackController } from '@/lib/voicePlayback';
 
-/* ─────────────────────────────────────────────────────────────────────────
-   Live voice-demo session.
+const API_BASE = (process.env.NEXT_PUBLIC_VOICE_API_URL ?? '').replace(/\/+$/, '');
+export const VOICE_DEMO_CONFIGURED = API_BASE.length > 0;
 
-   Wire format (must stay in sync with the voice backend):
-     connect   wss://HOST/ws/audio/{sessionId}?transport=binary&scenario=&lang=
-     server →  one text frame (JSON config / "ready") before any audio
-     client →  raw Int16 PCM, mono, 16 kHz, little-endian ArrayBuffers
-     server →  raw Int16 PCM, mono, 24 kHz, played back in arrival order
-
-   The session is half-duplex on purpose: while the agent's audio is still
-   scheduled we stop uploading, so the agent never hears itself.
-   ───────────────────────────────────────────────────────────────────────── */
-
-const BASE = (process.env.NEXT_PUBLIC_VOICE_WS_URL ?? '').replace(/\/+$/, '');
-
-/** False when NEXT_PUBLIC_VOICE_WS_URL is unset - the panel renders offline. */
-export const VOICE_DEMO_CONFIGURED = BASE.length > 0;
-
-const PLAYBACK_RATE = 24000;
 const CAPTURE_RATE = 16000;
-/** Keep the mic muted for a moment after the agent's last scheduled sample. */
-const TAIL = 0.15;
-/** How long we wait for the backend's ready frame before giving up. */
-const READY_TIMEOUT = 10000;
+const READY_TIMEOUT_MS = 10_000;
+const HEARTBEAT_MS = 15_000;
 
 export type VoiceState =
   | 'unconfigured'
@@ -46,18 +30,70 @@ const STATUS: Record<VoiceState, string> = {
   error: 'Something went wrong. Tap the microphone to try again.',
 };
 
+type DemoGrant = {
+  session_id: string;
+  scenario: VoiceScenario['id'];
+  language: VoiceLanguageCode;
+  websocket_url: string;
+  token: string;
+  expires_at: number;
+  max_duration_seconds: number;
+  features: { full_duplex: boolean };
+};
+
+type ServerEvent = {
+  type: string;
+  code?: string;
+  message?: string;
+  reason?: string;
+  playback_epoch?: number;
+};
+
 type WebkitWindow = Window & { webkitAudioContext?: typeof AudioContext };
 
-function sessionId() {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) return `demo-${crypto.randomUUID()}`;
-  return `demo-${Date.now().toString(36)}`;
+function validateGrant(
+  value: unknown,
+  expectedScenario: VoiceScenario['id'],
+  expectedLanguage: VoiceLanguageCode,
+): DemoGrant {
+  if (!value || typeof value !== 'object') throw new Error('invalid_grant');
+  const grant = value as Partial<DemoGrant>;
+  if (
+    typeof grant.session_id !== 'string' ||
+    !grant.session_id.startsWith('demo-') ||
+    grant.scenario !== expectedScenario ||
+    grant.language !== expectedLanguage ||
+    typeof grant.token !== 'string' ||
+    grant.token.length < 32 ||
+    typeof grant.websocket_url !== 'string' ||
+    typeof grant.max_duration_seconds !== 'number' ||
+    grant.max_duration_seconds < 1 ||
+    grant.max_duration_seconds > 300
+  ) {
+    throw new Error('invalid_grant');
+  }
+
+  const apiUrl = new URL(API_BASE);
+  const websocketUrl = new URL(grant.websocket_url);
+  const secure = websocketUrl.protocol === 'wss:';
+  const localDevelopment =
+    websocketUrl.protocol === 'ws:' && ['localhost', '127.0.0.1'].includes(websocketUrl.hostname);
+  if (
+    (!secure && !localDevelopment) ||
+    websocketUrl.host !== apiUrl.host ||
+    websocketUrl.pathname !== `/ws/demo/${grant.session_id}` ||
+    websocketUrl.username ||
+    websocketUrl.password ||
+    websocketUrl.searchParams.has('token')
+  ) {
+    throw new Error('invalid_websocket_url');
+  }
+  return grant as DemoGrant;
 }
 
 export function useVoiceSession() {
   const [state, setState] = useState<VoiceState>(VOICE_DEMO_CONFIGURED ? 'idle' : 'unconfigured');
-  const [status, setStatus] = useState<string>(
-    VOICE_DEMO_CONFIGURED ? STATUS.idle : STATUS.unconfigured,
-  );
+  const [status, setStatus] = useState(VOICE_DEMO_CONFIGURED ? STATUS.idle : STATUS.unconfigured);
 
   const wsRef = useRef<WebSocket | null>(null);
   const micCtxRef = useRef<AudioContext | null>(null);
@@ -67,23 +103,30 @@ export function useVoiceSession() {
   const workletRef = useRef<AudioWorkletNode | null>(null);
   const legacyRef = useRef<ScriptProcessorNode | null>(null);
   const sinkRef = useRef<GainNode | null>(null);
-  /** Read every frame by the visualiser; null whenever no call is running. */
   const analyserRef = useRef<AnalyserNode | null>(null);
-
-  const playCursor = useRef(0);
-  const speakingUntil = useRef(0);
+  const playbackRef = useRef<VoicePlaybackController | null>(null);
+  const fullDuplexRef = useRef(false);
   const startingRef = useRef(false);
   const openingRef = useRef(false);
   const readyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const sessionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const heartbeatTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const clearPlayback = useCallback((playbackEpoch?: number) => {
+    playbackRef.current?.clear(playbackEpoch);
+  }, []);
 
   const teardown = useCallback((next: VoiceState, message?: string) => {
     startingRef.current = false;
     openingRef.current = false;
+    fullDuplexRef.current = false;
 
-    if (readyTimer.current) {
-      clearTimeout(readyTimer.current);
-      readyTimer.current = null;
-    }
+    if (readyTimer.current) clearTimeout(readyTimer.current);
+    if (sessionTimer.current) clearTimeout(sessionTimer.current);
+    if (heartbeatTimer.current) clearInterval(heartbeatTimer.current);
+    readyTimer.current = null;
+    sessionTimer.current = null;
+    heartbeatTimer.current = null;
 
     const ws = wsRef.current;
     wsRef.current = null;
@@ -112,74 +155,44 @@ export function useVoiceSession() {
     sourceRef.current = null;
     sinkRef.current?.disconnect();
     sinkRef.current = null;
-
-    streamRef.current?.getTracks().forEach((t) => t.stop());
+    streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
+    playbackRef.current?.dispose();
+    playbackRef.current = null;
 
     for (const ref of [micCtxRef, playCtxRef]) {
       const ctx = ref.current;
       ref.current = null;
-      if (ctx && ctx.state !== 'closed') ctx.close().catch(() => {});
+      if (ctx && ctx.state !== 'closed') void ctx.close();
     }
-
-    playCursor.current = 0;
-    speakingUntil.current = 0;
 
     setState(next);
     setStatus(message ?? STATUS[next]);
   }, []);
 
-  /** Queue one inbound PCM frame on the playback cursor. */
   const enqueue = useCallback((data: ArrayBuffer) => {
-    const ctx = playCtxRef.current;
-    if (!ctx || ctx.state === 'closed') return;
-
-    const pcm = new Int16Array(data);
-    if (pcm.length === 0) return;
-
-    const floats = new Float32Array(pcm.length);
-    for (let i = 0; i < pcm.length; i++) floats[i] = pcm[i] / (pcm[i] < 0 ? 0x8000 : 0x7fff);
-
-    const buffer = ctx.createBuffer(1, floats.length, PLAYBACK_RATE);
-    buffer.copyToChannel(floats, 0);
-
-    const src = ctx.createBufferSource();
-    src.buffer = buffer;
-    src.connect(ctx.destination);
-
-    const now = ctx.currentTime;
-    if (playCursor.current < now) playCursor.current = now;
-    src.start(playCursor.current);
-    playCursor.current += buffer.duration;
-    speakingUntil.current = Math.max(speakingUntil.current, playCursor.current + TAIL);
+    playbackRef.current?.enqueue(data);
   }, []);
 
-  /** Send one captured chunk, unless the agent is still speaking. */
   const upload = useCallback((chunk: ArrayBuffer) => {
     const ws = wsRef.current;
-    if (!ws || ws.readyState !== WebSocket.OPEN) return;
-    const play = playCtxRef.current;
-    if (play && play.currentTime < speakingUntil.current) return;
+    if (!ws || ws.readyState !== WebSocket.OPEN || chunk.byteLength > 16_384) return;
+    if (!fullDuplexRef.current && playbackRef.current?.isSpeaking()) return;
     ws.send(chunk);
   }, []);
 
-  /** Build the capture graph once the backend says it is ready. */
   const openMic = useCallback(async () => {
     const ctx = micCtxRef.current;
     const stream = streamRef.current;
     if (!ctx || !stream || openingRef.current || workletRef.current || legacyRef.current) return;
     openingRef.current = true;
-
     const source = ctx.createMediaStreamSource(stream);
     sourceRef.current = source;
-
     const analyser = ctx.createAnalyser();
     analyser.fftSize = 128;
     analyser.smoothingTimeConstant = 0.8;
     source.connect(analyser);
     analyserRef.current = analyser;
-
-    // Silent sink - the graph only pulls frames while it reaches a destination.
     const sink = ctx.createGain();
     sink.gain.value = 0;
     sink.connect(ctx.destination);
@@ -187,26 +200,25 @@ export function useVoiceSession() {
 
     if (ctx.audioWorklet) {
       await ctx.audioWorklet.addModule('/voice/pcm-recorder-worklet.js');
-      if (!micCtxRef.current) return; // torn down while the module loaded
+      if (!micCtxRef.current) return;
       const node = new AudioWorkletNode(ctx, 'pcm-recorder', {
         numberOfInputs: 1,
         numberOfOutputs: 1,
         outputChannelCount: [1],
       });
-      node.port.onmessage = (e) => upload(e.data as ArrayBuffer);
+      node.port.onmessage = (event) => upload(event.data as ArrayBuffer);
       analyser.connect(node);
       node.connect(sink);
       workletRef.current = node;
     } else {
-      // Safari < 14.1 and friends: the deprecated processor still works.
       const node = ctx.createScriptProcessor(4096, 1, 1);
-      node.onaudioprocess = (e) => {
-        const input = e.inputBuffer.getChannelData(0);
-        e.outputBuffer.getChannelData(0).fill(0);
+      node.onaudioprocess = (event) => {
+        const input = event.inputBuffer.getChannelData(0);
+        event.outputBuffer.getChannelData(0).fill(0);
         const pcm = new Int16Array(input.length);
-        for (let i = 0; i < input.length; i++) {
-          const s = Math.max(-1, Math.min(1, input[i]));
-          pcm[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+        for (let index = 0; index < input.length; index += 1) {
+          const sample = Math.max(-1, Math.min(1, input[index]));
+          pcm[index] = sample < 0 ? sample * 0x8000 : sample * 0x7fff;
         }
         upload(pcm.buffer);
       };
@@ -214,107 +226,124 @@ export function useVoiceSession() {
       node.connect(sink);
       legacyRef.current = node;
     }
-
     openingRef.current = false;
     startingRef.current = false;
     setState('live');
     setStatus(STATUS.live);
   }, [upload]);
 
-  const start = useCallback(
-    async (scenario: VoiceScenario) => {
-      if (!VOICE_DEMO_CONFIGURED || startingRef.current || wsRef.current) return;
-      startingRef.current = true;
-      setState('connecting');
-      setStatus(STATUS.connecting);
+  const start = useCallback(async (scenario: VoiceScenario, language: VoiceLanguageCode) => {
+    if (!VOICE_DEMO_CONFIGURED || startingRef.current || wsRef.current) return;
+    startingRef.current = true;
+    setState('connecting');
+    setStatus(STATUS.connecting);
 
-      // Audio contexts and the mic prompt stay inside the click gesture -
-      // Safari and iOS refuse to unlock audio from an async callback later on.
-      const Ctor = window.AudioContext ?? (window as WebkitWindow).webkitAudioContext;
-      if (!Ctor || !navigator.mediaDevices?.getUserMedia) {
-        teardown('error', 'This browser cannot capture audio. Try Chrome, Edge, or Safari 15+.');
+    const Ctor = window.AudioContext ?? (window as WebkitWindow).webkitAudioContext;
+    if (!Ctor || !navigator.mediaDevices?.getUserMedia) {
+      teardown('error', 'This browser cannot capture audio. Try Chrome, Edge, or Safari 15+.');
+      return;
+    }
+    try {
+      const playCtx = new Ctor();
+      playCtxRef.current = playCtx;
+      await playCtx.resume();
+      playbackRef.current = await VoicePlaybackController.create(playCtx);
+      const micCtx = new Ctor({ sampleRate: CAPTURE_RATE });
+      micCtxRef.current = micCtx;
+      await micCtx.resume();
+      streamRef.current = await navigator.mediaDevices.getUserMedia({
+        audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      });
+    } catch {
+      teardown('error', 'Microphone access is needed for the voice preview.');
+      return;
+    }
+
+    let grant: DemoGrant;
+    try {
+      const response = await fetch(`${API_BASE}/api/demo/sessions`, {
+        method: 'POST',
+        mode: 'cors',
+        cache: 'no-store',
+        credentials: 'omit',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scenario: scenario.id, language }),
+      });
+      if (!response.ok) throw new Error(`session_${response.status}`);
+      grant = validateGrant(await response.json(), scenario.id, language);
+    } catch {
+      teardown('error', 'The voice preview is busy or unavailable. Try again shortly.');
+      return;
+    }
+
+    let ws: WebSocket;
+    try {
+      ws = new WebSocket(grant.websocket_url, ['zeptaz-demo', `token.${grant.token}`]);
+    } catch {
+      teardown('error', 'We could not reach the voice service. Try again shortly.');
+      return;
+    }
+    ws.binaryType = 'arraybuffer';
+    wsRef.current = ws;
+    fullDuplexRef.current = Boolean(grant.features?.full_duplex);
+    sessionTimer.current = setTimeout(
+      () => teardown('ended', 'The demo time limit was reached. Tap the microphone to start again.'),
+      grant.max_duration_seconds * 1000 + 1_000,
+    );
+
+    ws.onopen = () => {
+      setState('waiting');
+      setStatus(STATUS.waiting);
+      readyTimer.current = setTimeout(
+        () => teardown('error', 'The voice service did not respond. Try again shortly.'),
+        READY_TIMEOUT_MS,
+      );
+      heartbeatTimer.current = setInterval(() => {
+        if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'ping' }));
+      }, HEARTBEAT_MS);
+    };
+    ws.onmessage = (event) => {
+      if (event.data instanceof ArrayBuffer) {
+        enqueue(event.data);
         return;
       }
-
+      if (typeof event.data !== 'string') return;
+      let message: ServerEvent;
       try {
-        const playCtx = new Ctor();
-        playCtxRef.current = playCtx;
-        await playCtx.resume();
-        playCursor.current = playCtx.currentTime;
-
-        const micCtx = new Ctor({ sampleRate: CAPTURE_RATE });
-        micCtxRef.current = micCtx;
-        await micCtx.resume();
+        message = JSON.parse(event.data) as ServerEvent;
       } catch {
-        teardown('error', 'This browser cannot start audio playback.');
         return;
       }
-
-      try {
-        streamRef.current = await navigator.mediaDevices.getUserMedia({
-          audio: {
-            channelCount: 1,
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true,
-          },
-        });
-      } catch {
-        teardown('error', 'Microphone access is needed for the voice preview.');
-        return;
+      if (message.type === 'ready') {
+        if (readyTimer.current) clearTimeout(readyTimer.current);
+        readyTimer.current = null;
+        void openMic().catch(() => teardown('error', 'We could not open the microphone stream.'));
+      } else if (message.type === 'playback.clear') {
+        clearPlayback(message.playback_epoch);
+      } else if (message.type === 'reconnecting') {
+        clearPlayback();
+        setStatus('The voice agent is reconnecting…');
+      } else if (message.type === 'reconnected') {
+        setStatus(STATUS.live);
+      } else if (message.type === 'ended') {
+        teardown('ended');
+      } else if (message.type === 'error') {
+        teardown('error', 'The voice service ended the call. Try again shortly.');
       }
+    };
+    ws.onerror = () => teardown('error', 'We could not reach the voice service. Try again shortly.');
+    ws.onclose = () => {
+      if (wsRef.current === ws) teardown('ended');
+    };
+  }, [clearPlayback, enqueue, openMic, teardown]);
 
-      const url =
-        `${BASE}/ws/audio/${sessionId()}?transport=binary` +
-        `&scenario=${encodeURIComponent(scenario.id)}&lang=${encodeURIComponent(scenario.locale)}`;
-
-      let ws: WebSocket;
-      try {
-        ws = new WebSocket(url);
-      } catch {
-        teardown('error', 'We could not reach the voice service. Try again shortly.');
-        return;
-      }
-      ws.binaryType = 'arraybuffer';
-      wsRef.current = ws;
-
-      ws.onopen = () => {
-        setState('waiting');
-        setStatus(STATUS.waiting);
-        readyTimer.current = setTimeout(() => {
-          if (!openingRef.current && !workletRef.current && !legacyRef.current) {
-            teardown('error', 'The voice service did not respond. Try again shortly.');
-          }
-        }, READY_TIMEOUT);
-      };
-
-      ws.onmessage = (e) => {
-        if (typeof e.data === 'string') {
-          if (readyTimer.current) {
-            clearTimeout(readyTimer.current);
-            readyTimer.current = null;
-          }
-          void openMic().catch(() =>
-            teardown('error', 'We could not open the microphone stream.'),
-          );
-          return;
-        }
-        if (e.data instanceof ArrayBuffer) enqueue(e.data);
-      };
-
-      ws.onerror = () => teardown('error', 'We could not reach the voice service. Try again shortly.');
-      ws.onclose = () => {
-        if (wsRef.current === ws) teardown('ended');
-      };
-    },
-    [teardown, openMic, enqueue],
-  );
-
-  const stop = useCallback(() => teardown('ended'), [teardown]);
+  const stop = useCallback(() => {
+    const ws = wsRef.current;
+    if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'end' }));
+    teardown('ended');
+  }, [teardown]);
 
   useEffect(() => () => teardown('idle'), [teardown]);
-
   const active = state === 'connecting' || state === 'waiting' || state === 'live';
-
   return { state, status, active, analyser: analyserRef, start, stop };
 }
