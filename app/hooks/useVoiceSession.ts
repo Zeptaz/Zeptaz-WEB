@@ -1,14 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { VoiceScenario } from '@/lib/voice';
+import type { VoiceLanguageCode, VoiceScenario } from '@/lib/voice';
+import { VoicePlaybackController } from '@/lib/voicePlayback';
 
 const API_BASE = (process.env.NEXT_PUBLIC_VOICE_API_URL ?? '').replace(/\/+$/, '');
 export const VOICE_DEMO_CONFIGURED = API_BASE.length > 0;
 
-const PLAYBACK_RATE = 24000;
 const CAPTURE_RATE = 16000;
-const TAIL_SECONDS = 0.15;
 const READY_TIMEOUT_MS = 10_000;
 const HEARTBEAT_MS = 15_000;
 
@@ -34,7 +33,7 @@ const STATUS: Record<VoiceState, string> = {
 type DemoGrant = {
   session_id: string;
   scenario: VoiceScenario['id'];
-  language: VoiceScenario['languageCode'];
+  language: VoiceLanguageCode;
   websocket_url: string;
   token: string;
   expires_at: number;
@@ -47,17 +46,23 @@ type ServerEvent = {
   code?: string;
   message?: string;
   reason?: string;
+  playback_epoch?: number;
 };
 
 type WebkitWindow = Window & { webkitAudioContext?: typeof AudioContext };
 
-function validateGrant(value: unknown, expectedScenario: VoiceScenario['id']): DemoGrant {
+function validateGrant(
+  value: unknown,
+  expectedScenario: VoiceScenario['id'],
+  expectedLanguage: VoiceLanguageCode,
+): DemoGrant {
   if (!value || typeof value !== 'object') throw new Error('invalid_grant');
   const grant = value as Partial<DemoGrant>;
   if (
     typeof grant.session_id !== 'string' ||
     !grant.session_id.startsWith('demo-') ||
     grant.scenario !== expectedScenario ||
+    grant.language !== expectedLanguage ||
     typeof grant.token !== 'string' ||
     grant.token.length < 32 ||
     typeof grant.websocket_url !== 'string' ||
@@ -99,29 +104,16 @@ export function useVoiceSession() {
   const legacyRef = useRef<ScriptProcessorNode | null>(null);
   const sinkRef = useRef<GainNode | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
-  const scheduledSourcesRef = useRef(new Set<AudioBufferSourceNode>());
+  const playbackRef = useRef<VoicePlaybackController | null>(null);
   const fullDuplexRef = useRef(false);
-  const playCursor = useRef(0);
-  const speakingUntil = useRef(0);
   const startingRef = useRef(false);
   const openingRef = useRef(false);
   const readyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sessionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const heartbeatTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const clearPlayback = useCallback(() => {
-    for (const source of scheduledSourcesRef.current) {
-      try {
-        source.stop();
-      } catch {
-        // The source may already have ended.
-      }
-      source.disconnect();
-    }
-    scheduledSourcesRef.current.clear();
-    const ctx = playCtxRef.current;
-    playCursor.current = ctx?.currentTime ?? 0;
-    speakingUntil.current = 0;
+  const clearPlayback = useCallback((playbackEpoch?: number) => {
+    playbackRef.current?.clear(playbackEpoch);
   }, []);
 
   const teardown = useCallback((next: VoiceState, message?: string) => {
@@ -165,7 +157,8 @@ export function useVoiceSession() {
     sinkRef.current = null;
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
-    clearPlayback();
+    playbackRef.current?.dispose();
+    playbackRef.current = null;
 
     for (const ref of [micCtxRef, playCtxRef]) {
       const ctx = ref.current;
@@ -175,38 +168,16 @@ export function useVoiceSession() {
 
     setState(next);
     setStatus(message ?? STATUS[next]);
-  }, [clearPlayback]);
+  }, []);
 
   const enqueue = useCallback((data: ArrayBuffer) => {
-    const ctx = playCtxRef.current;
-    if (!ctx || ctx.state === 'closed' || data.byteLength % 2 !== 0) return;
-    const pcm = new Int16Array(data);
-    if (!pcm.length) return;
-    const floats = new Float32Array(pcm.length);
-    for (let index = 0; index < pcm.length; index += 1) {
-      floats[index] = pcm[index] / (pcm[index] < 0 ? 0x8000 : 0x7fff);
-    }
-    const buffer = ctx.createBuffer(1, floats.length, PLAYBACK_RATE);
-    buffer.copyToChannel(floats, 0);
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.connect(ctx.destination);
-    scheduledSourcesRef.current.add(source);
-    source.onended = () => {
-      scheduledSourcesRef.current.delete(source);
-      source.disconnect();
-    };
-    if (playCursor.current < ctx.currentTime) playCursor.current = ctx.currentTime;
-    source.start(playCursor.current);
-    playCursor.current += buffer.duration;
-    speakingUntil.current = Math.max(speakingUntil.current, playCursor.current + TAIL_SECONDS);
+    playbackRef.current?.enqueue(data);
   }, []);
 
   const upload = useCallback((chunk: ArrayBuffer) => {
     const ws = wsRef.current;
     if (!ws || ws.readyState !== WebSocket.OPEN || chunk.byteLength > 16_384) return;
-    const play = playCtxRef.current;
-    if (!fullDuplexRef.current && play && play.currentTime < speakingUntil.current) return;
+    if (!fullDuplexRef.current && playbackRef.current?.isSpeaking()) return;
     ws.send(chunk);
   }, []);
 
@@ -261,7 +232,7 @@ export function useVoiceSession() {
     setStatus(STATUS.live);
   }, [upload]);
 
-  const start = useCallback(async (scenario: VoiceScenario) => {
+  const start = useCallback(async (scenario: VoiceScenario, language: VoiceLanguageCode) => {
     if (!VOICE_DEMO_CONFIGURED || startingRef.current || wsRef.current) return;
     startingRef.current = true;
     setState('connecting');
@@ -276,7 +247,7 @@ export function useVoiceSession() {
       const playCtx = new Ctor();
       playCtxRef.current = playCtx;
       await playCtx.resume();
-      playCursor.current = playCtx.currentTime;
+      playbackRef.current = await VoicePlaybackController.create(playCtx);
       const micCtx = new Ctor({ sampleRate: CAPTURE_RATE });
       micCtxRef.current = micCtx;
       await micCtx.resume();
@@ -296,10 +267,10 @@ export function useVoiceSession() {
         cache: 'no-store',
         credentials: 'omit',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scenario: scenario.id, language: scenario.languageCode }),
+        body: JSON.stringify({ scenario: scenario.id, language }),
       });
       if (!response.ok) throw new Error(`session_${response.status}`);
-      grant = validateGrant(await response.json(), scenario.id);
+      grant = validateGrant(await response.json(), scenario.id, language);
     } catch {
       teardown('error', 'The voice preview is busy or unavailable. Try again shortly.');
       return;
@@ -348,8 +319,9 @@ export function useVoiceSession() {
         readyTimer.current = null;
         void openMic().catch(() => teardown('error', 'We could not open the microphone stream.'));
       } else if (message.type === 'playback.clear') {
-        clearPlayback();
+        clearPlayback(message.playback_epoch);
       } else if (message.type === 'reconnecting') {
+        clearPlayback();
         setStatus('The voice agent is reconnecting…');
       } else if (message.type === 'reconnected') {
         setStatus(STATUS.live);
