@@ -10,11 +10,15 @@ export default function PageHero({
   title,
   lead,
   tone = 'dark',
+  index,
+  aside,
 }: {
   eyebrow?: string;
   title: React.ReactNode;
   lead: string;
   tone?: 'dark' | 'light';
+  index?: string;
+  aside?: React.ReactNode;
 }) {
   const light = tone === 'light';
   return (
@@ -30,16 +34,22 @@ export default function PageHero({
         style={{ background: 'radial-gradient(ellipse 70% 60% at 50% 20%, rgb(220 20 60 / calc(0.08 * var(--glow-strength))), transparent 60%)' }}
       />
       <div className="section-shell relative">
-        {eyebrow && <Eyebrow tone={tone} className="mb-6">{eyebrow}</Eyebrow>}
-        <Reveal as="h1" className={cn('display-hero max-w-[18ch]', light ? 'text-ink' : 'text-text-primary')}>
-          {title}
-        </Reveal>
-        <Reveal as="p" delay={0.05} className={cn('mt-6 max-w-2xl text-base leading-relaxed', light ? 'text-ink-secondary' : 'text-text-secondary')}>
-          {lead}
-        </Reveal>
-        <Reveal as="div" delay={0.1} className="mt-9">
-          <Link href="/contact" className="btn btn-primary">{SITE.ctaPrimary}</Link>
-        </Reveal>
+        {index && <span className={cn('mono-meta absolute right-0 top-0 hidden sm:block', light ? 'text-ink-muted' : 'text-text-faint')}>{index}</span>}
+        <div className={cn(aside && 'grid gap-10 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end')}>
+          <div>
+            {eyebrow && <Eyebrow tone={tone} className="mb-6">{eyebrow}</Eyebrow>}
+            <Reveal as="h1" className={cn('display-hero max-w-[18ch]', light ? 'text-ink' : 'text-text-primary')}>
+              {title}
+            </Reveal>
+            <Reveal as="p" delay={0.05} className={cn('mt-6 max-w-2xl text-base leading-relaxed', light ? 'text-ink-secondary' : 'text-text-secondary')}>
+              {lead}
+            </Reveal>
+            <Reveal as="div" delay={0.1} className="mt-9">
+              <Link href="/contact" className="btn btn-primary">{SITE.ctaPrimary}</Link>
+            </Reveal>
+          </div>
+          {aside && <Reveal as="aside" delay={0.14}>{aside}</Reveal>}
+        </div>
       </div>
     </section>
   );

@@ -23,11 +23,11 @@ export const SITE = {
 
 export const NAV_LINKS = [
   { label: 'Services', href: '/services' },
+  { label: 'Work', href: '/work' },
   { label: 'Voice', href: '/products/voice-agent' },
   { label: 'Engine', href: '/engine' },
   { label: 'Process', href: '/process' },
   { label: 'Pricing', href: '/pricing' },
-  { label: 'Blog', href: '/blog' },
   { label: 'About', href: '/about' },
 ];
 

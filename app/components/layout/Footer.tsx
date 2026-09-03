@@ -9,6 +9,7 @@ import AsciiWall from '@/components/ui/AsciiWall';
 
 const COMPANY = [
   { label: 'About', href: '/about' },
+  { label: 'Blog', href: '/blog' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Contact', href: '/contact' },
 ];
