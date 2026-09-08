@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Mic, Square, LoaderCircle, PhoneOff } from 'lucide-react';
 import {
   VOICE,
@@ -19,7 +19,30 @@ import VoiceVisualizer from './VoiceVisualizer';
 export default function VoiceDemo() {
   const [scenario, setScenario] = useState<VoiceScenario>(VOICE_SCENARIOS[0]);
   const [language, setLanguage] = useState<VoiceLanguageCode>('auto');
+  const [saveHistory, setSaveHistory] = useState(false);
+  const [noticeVersion, setNoticeVersion] = useState('');
+  const [scenarios, setScenarios] = useState(VOICE_SCENARIOS);
+  const [businessLanguages, setBusinessLanguages] = useState<Record<string, string[]>>({});
   const { state, status, active, analyser, start, stop } = useVoiceSession();
+  useEffect(() => {
+    const base = (process.env.NEXT_PUBLIC_VOICE_API_URL ?? '').replace(/\/+$/, '');
+    if (!base) return;
+    const controller = new AbortController();
+    fetch(`${base}/api/demo/scenarios`, { credentials: 'omit', cache: 'no-store', signal: controller.signal })
+      .then(response => { if (!response.ok) throw new Error('unavailable'); return response.json(); })
+      .then(data => {
+        if (data.history_available === true && typeof data.privacy_notice_version === 'string') setNoticeVersion(data.privacy_notice_version);
+        if (Array.isArray(data.scenarios)) setScenarios(VOICE_SCENARIOS.map(original => {
+          const published = data.scenarios.find((item: { id?: string }) => item.id === original.id);
+          return published && typeof published.business === 'string' && typeof published.prompt === 'string'
+            ? { ...original, business: published.business, prompt: published.prompt } : original;
+        }));
+        if (Array.isArray(data.scenarios)) setBusinessLanguages(Object.fromEntries(data.scenarios
+          .filter((item: { id?: string; supported_languages?: unknown }) => typeof item.id === 'string' && Array.isArray(item.supported_languages))
+          .map((item: { id: string; supported_languages: string[] }) => [item.id, item.supported_languages])));
+      }).catch(() => { /* Original scenarios remain usable; history stays off. */ });
+    return () => controller.abort();
+  }, []);
 
   const live = state === 'live';
   const busy = state === 'connecting' || state === 'waiting';
@@ -33,6 +56,7 @@ export default function VoiceDemo() {
     if (next.id === scenario.id) return;
     if (active) stop();
     setScenario(next);
+    setLanguage('auto');
   };
 
   return (
@@ -74,7 +98,7 @@ export default function VoiceDemo() {
               aria-label="Voice preview language"
               className="min-w-40 border border-border-strong bg-bg-primary px-3 py-2 font-mono text-[11px] uppercase tracking-[0.12em] text-text-primary focus:border-crimson focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {VOICE_LANGUAGE_OPTIONS.map((option) => (
+              {VOICE_LANGUAGE_OPTIONS.filter(option => option.value === 'auto' || !businessLanguages[scenario.id] || businessLanguages[scenario.id].includes(option.value)).map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
               ))}
             </select>
@@ -83,7 +107,7 @@ export default function VoiceDemo() {
 
         {/* scenario tabs */}
         <div className="mt-px grid gap-px bg-border sm:grid-cols-3">
-          {VOICE_SCENARIOS.map((s) => {
+          {scenarios.map((s) => {
             const on = s.id === scenario.id;
             return (
               <button
@@ -129,7 +153,7 @@ export default function VoiceDemo() {
             {/* who you're calling */}
             <div className="border-b border-border p-6 sm:p-8 lg:border-b-0 lg:border-r">
               <p className="mono-meta text-text-faint">You’re calling</p>
-              <p className="mt-3 heading-lg text-text-primary">{scenario.business}</p>
+              <p className="mt-3 heading-lg text-text-primary">{scenarios.find(item => item.id === scenario.id)?.business ?? scenario.business}</p>
               <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">
                 {scenario.type}
               </p>
@@ -158,7 +182,7 @@ export default function VoiceDemo() {
                 <>
                   <button
                     type="button"
-                    onClick={() => (active ? stop() : start(scenario, language))}
+                    onClick={() => (active ? stop() : start(scenario, language, { save: saveHistory && Boolean(noticeVersion), noticeVersion }))}
                     aria-pressed={active}
                     aria-label={active ? 'End the voice preview call' : 'Start the voice preview call'}
                     className={cn(
@@ -195,9 +219,14 @@ export default function VoiceDemo() {
           </div>
 
           {/* footnote */}
-          <p className="border-t border-border px-5 py-3 text-center font-mono text-[10px] uppercase tracking-[0.14em] text-text-faint">
-            Demo businesses · Audio is processed live by Google Gemini and is not stored as a recording ·
-            Transcripts and personal details are deleted when the session ends · Please use sample information only
+          {noticeVersion && <label className="flex items-start justify-center gap-3 border-t border-border px-5 py-4 text-sm text-text-secondary">
+            <input type="checkbox" checked={saveHistory} disabled={active} onChange={event => setSaveHistory(event.target.checked)} className="mt-1 accent-[#DC143C]" />
+            <span>Allow Zeptaz to save this demo call’s transcript and demo action details for up to 30 days for review. Optional.</span>
+          </label>}
+          <p className="border-t border-border px-5 py-3 text-center text-xs leading-relaxed text-text-secondary">
+            Demo businesses · Audio is processed live by Google Gemini; Zeptaz does not save an audio recording.
+            {noticeVersion ? ' If you choose to save the call, its transcript and demo action details are deleted after 30 days. Otherwise, call content is deleted when the session ends.' : ' Call content is deleted when the session ends.'}
+            {' '}Non-content usage metrics may be retained. Please use sample information only. Google’s processing is subject to its own terms.
           </p>
         </div>
       </div>

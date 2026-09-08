@@ -232,7 +232,7 @@ export function useVoiceSession() {
     setStatus(STATUS.live);
   }, [upload]);
 
-  const start = useCallback(async (scenario: VoiceScenario, language: VoiceLanguageCode) => {
+  const start = useCallback(async (scenario: VoiceScenario, language: VoiceLanguageCode, history?: { save: boolean; noticeVersion: string }) => {
     if (!VOICE_DEMO_CONFIGURED || startingRef.current || wsRef.current) return;
     startingRef.current = true;
     setState('connecting');
@@ -267,7 +267,9 @@ export function useVoiceSession() {
         cache: 'no-store',
         credentials: 'omit',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ scenario: scenario.id, language }),
+        body: JSON.stringify({ scenario: scenario.id, language,
+          save_history: history?.save === true,
+          privacy_notice_version: history?.save ? history.noticeVersion : undefined }),
       });
       if (!response.ok) throw new Error(`session_${response.status}`);
       grant = validateGrant(await response.json(), scenario.id, language);
@@ -326,7 +328,12 @@ export function useVoiceSession() {
       } else if (message.type === 'reconnected') {
         setStatus(STATUS.live);
       } else if (message.type === 'ended') {
-        teardown('ended');
+        teardown(
+          'ended',
+          message.reason === 'demo_time_limit'
+            ? 'The two-minute demo has finished. Tap the microphone to start again.'
+            : undefined,
+        );
       } else if (message.type === 'error') {
         teardown('error', 'The voice service ended the call. Try again shortly.');
       }
