@@ -41,9 +41,21 @@ Run before merging or deploying:
 
 ```bash
 npm ci
+npm run test:work
 npm run test:voice
 npm run build
 ```
+
+Deploy this repository as a standard Next.js Vercel project. The repository root is the application root; no custom build or output directory is required. A clean build downloads Geist through `next/font`, so the build environment must be able to reach Google Fonts.
+
+Verify the website before the optional voice integration:
+
+1. `/work` has one case-study link per project and no direct demo links.
+2. Complete one embedded six-step walkthrough and open its read-only details.
+3. Expand it and return; the current step should be preserved.
+4. `/blog` shows published posts, or is empty when Supabase is intentionally absent.
+5. `/admin` redirects an unauthenticated visitor to `/admin/login`.
+6. `/contact` submits through EmailJS or opens the documented mail-client fallback.
 
 After deployment, verify:
 

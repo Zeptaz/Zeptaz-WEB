@@ -146,7 +146,7 @@ export default function Navbar() {
               <LogoMark className="h-9 w-9 text-white" />
             </span>
             <span
-              className="inline font-display text-[19px] font-extrabold uppercase leading-none tracking-[0.16em] md:hidden lg:inline"
+              className="inline font-display text-[19px] font-extrabold uppercase leading-none tracking-[0.16em] lg:hidden xl:inline"
               style={{ color: ink }}
             >
               Zeptaz
@@ -157,7 +157,7 @@ export default function Navbar() {
           <nav
             ref={navRef}
             onMouseLeave={() => placeIndicator(activeLinkEl(), true)}
-            className="absolute left-1/2 top-0 hidden h-full -translate-x-1/2 items-stretch md:flex"
+            className="absolute left-1/2 top-0 hidden h-full -translate-x-1/2 items-stretch lg:flex"
           >
             {NAV_LINKS.map((l, i) => {
               const active = isActive(l.href);
@@ -167,11 +167,11 @@ export default function Navbar() {
                   href={l.href}
                   data-active={active ? 'true' : undefined}
                   onMouseEnter={(e) => placeIndicator(e.currentTarget, true)}
-                  className="group flex items-center gap-1.5 px-3.5"
+                  className="group flex items-center gap-1.5 px-2 xl:px-3.5"
                 >
                   <span
                     className={cn(
-                      'hidden font-mono text-[9px] tracking-[0.1em] lg:inline',
+                      'hidden font-mono text-[9px] tracking-[0.1em] xl:inline',
                       active ? 'text-crimson' : light ? 'text-ink-muted' : 'text-text-faint',
                     )}
                   >
@@ -201,7 +201,7 @@ export default function Navbar() {
           </nav>
 
           {/* Right: status readout + CTA */}
-          <div className="hidden items-center gap-5 md:flex">
+          <div className="hidden items-center gap-5 lg:flex">
             <span
               className={cn(
                 'hidden items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] xl:flex',
@@ -219,7 +219,7 @@ export default function Navbar() {
 
           {/* Mobile toggle - -mr-3 keeps the 44px target flush with the shell edge */}
           <button
-            className="-mr-3 flex h-11 w-11 items-center justify-center md:hidden"
+            className="-mr-3 flex h-11 w-11 items-center justify-center lg:hidden"
             onClick={() => setOpen((v) => !v)}
             aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}
@@ -240,7 +240,7 @@ export default function Navbar() {
         ref={overlayRef}
         id="mobile-menu"
         inert={!open}
-        className="absolute inset-x-0 top-0 -z-10 flex h-[100svh] flex-col overflow-y-auto bg-bg-primary md:hidden"
+        className="absolute inset-x-0 top-0 -z-10 flex h-[100svh] flex-col overflow-y-auto bg-bg-primary lg:hidden"
         style={{ opacity: 0, visibility: 'hidden' }}
       >
         <div aria-hidden className="dot-grid absolute inset-0" />

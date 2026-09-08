@@ -1,111 +1,28 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Check, Layers3, UserRound } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import PortfolioDemo from '@/components/work/PortfolioDemo';
 import CtaBand from '@/components/ui/CtaBand';
 import { CASE_STUDIES, CASE_STUDY_BY_SLUG, isWorkSlug } from '@/lib/work';
-
-export function generateStaticParams() {
-  return CASE_STUDIES.map(({ slug }) => ({ slug }));
-}
-
+export function generateStaticParams() { return CASE_STUDIES.map(({ slug }) => ({ slug })); }
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   if (!isWorkSlug(slug)) return {};
   const study = CASE_STUDY_BY_SLUG[slug];
-  return {
-    title: `${study.shortTitle} — Zeptaz Work`,
-    description: study.description,
-    alternates: { canonical: `/work/${study.slug}` },
-    openGraph: { title: study.title, description: study.description, url: `/work/${study.slug}` },
-  };
+  return { title: `${study.shortTitle} — Zeptaz Work`, description: study.description, alternates: { canonical: `/work/${slug}` }, openGraph: { title:study.title, description:study.description,url:`/work/${slug}` }, twitter: { card: 'summary_large_image', title: study.title, description: study.description } };
 }
-
-export default async function CaseStudyPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function CaseStudyPage({ params }: { params: Promise<{ slug:string }> }) {
   const { slug } = await params;
   if (!isWorkSlug(slug)) notFound();
   const study = CASE_STUDY_BY_SLUG[slug];
-  const index = CASE_STUDIES.findIndex((item) => item.slug === study.slug);
-  const next = CASE_STUDIES[(index + 1) % CASE_STUDIES.length];
-
-  return (
-    <>
-      <article style={{ '--demo-accent': study.accent } as React.CSSProperties}>
-        <header data-nav="dark" className="case-hero section-dark grid-lines">
-          <div className="section-shell">
-            <Link href="/work" className="case-back"><ArrowLeft size={14} /> All work</Link>
-            <div className="case-hero-grid">
-              <div>
-                <span className="eyebrow text-crimson">{study.eyebrow}</span>
-                <h1 className="display-hero">{study.title}</h1>
-              </div>
-              <div className="case-hero-side">
-                <span className="mono-meta">Case file {study.number} / 04</span>
-                <p>{study.description}</p>
-                <a href="#demo" className="btn btn-primary">Run the demonstration</a>
-              </div>
-            </div>
-            <div className="case-workflow" aria-label="Workflow overview">
-              {study.workflow.map((item, step) => <div key={item}><span>{String(step + 1).padStart(2, '0')}</span><strong>{item}</strong>{step < study.workflow.length - 1 && <i />}</div>)}
-            </div>
-          </div>
-        </header>
-
-        <section data-nav="light" className="section-light case-context-section">
-          <div className="section-shell case-context-grid">
-            <div className="case-context-intro"><span className="eyebrow text-crimson">The operational problem</span><h2 className="heading-xl">Built around the work,<br />not the model.</h2></div>
-            <div className="case-context-cards">
-              <div><span><UserRound size={16} /> For</span><p>{study.audience}</p></div>
-              <div><span><Layers3 size={16} /> Problem</span><p>{study.problem}</p></div>
-              <div><span><Check size={16} /> System</span><p>{study.solution}</p></div>
-            </div>
-          </div>
-        </section>
-
-        <section id="demo" data-nav="dark" className="section-dark case-demo-section">
-          <div className="section-shell">
-            <div className="case-section-heading">
-              <div><span className="eyebrow text-crimson">Interactive walkthrough</span><h2 className="heading-xl">{study.demoTitle}</h2></div>
-              <p>{study.demoDescription} Use the guided mode or inspect each checkpoint manually.</p>
-            </div>
-            <PortfolioDemo study={study} />
-          </div>
-        </section>
-
-        <section data-nav="light" className="section-light case-features-section">
-          <div className="section-shell">
-            <div className="case-section-heading case-section-heading-dark">
-              <div><span className="eyebrow text-crimson">Inside the system</span><h2 className="heading-xl">Controls that make the workflow useful.</h2></div>
-              <p>{study.value}</p>
-            </div>
-            <div className="case-feature-grid">
-              {study.features.map((feature, featureIndex) => (
-                <div key={feature.title}><span>{String(featureIndex + 1).padStart(2, '0')}</span><h3>{feature.title}</h3><p>{feature.description}</p></div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section data-nav="dark" className="section-dark case-tech-section grid-lines">
-          <div className="section-shell case-tech-grid">
-            <div><span className="eyebrow text-crimson">Technology exposure</span><h2 className="heading-lg">A connected stack shaped around the workflow.</h2></div>
-            <div className="case-tech-list">
-              <div><span className="mono-meta">Core technology</span><div>{study.technology.map((item) => <span key={item}>{item}</span>)}</div></div>
-              <div><span className="mono-meta">Integration architecture</span><div>{study.integrations.map((item) => <span key={item}>{item}</span>)}</div></div>
-              <aside><strong>Implementation note</strong><p>{study.implementationNote}</p></aside>
-            </div>
-          </div>
-        </section>
-
-        <section data-nav="light" className="section-light next-case-section">
-          <div className="section-shell">
-            <span className="mono-meta">Next case file</span>
-            <Link href={`/work/${next.slug}`}><span>{next.number}</span><strong>{next.title}</strong><ArrowRight size={28} /></Link>
-          </div>
-        </section>
-      </article>
-      <CtaBand title={study.cta} lead="Bring us the current workflow, the tools involved, and the point where work gets stuck. We’ll map the smallest reliable system around it." />
-    </>
-  );
+  const next = CASE_STUDIES[(CASE_STUDIES.findIndex(x=>x.slug===slug)+1)%4];
+  return <><article>
+    <header className="section-dark case-hero" data-nav="dark"><div className="section-shell"><Link className="case-back" href="/work"><ArrowLeft size={16}/> All work</Link><div className="case-hero-grid"><div><span className="eyebrow text-crimson">{study.shortTitle}</span><h1>{study.title}</h1></div><div className="case-hero-side"><p>{study.description}</p><a className="btn btn-primary" href="#demo">Try the demo <ArrowRight size={16}/></a><span className="mono-meta">Case {study.number} / 04 · fictional scenario</span></div></div></div></header>
+    <section className="section-light case-context-section" data-nav="light"><div className="section-shell"><span className="eyebrow text-crimson">Where the work gets stuck</span><div className="case-context-cards"><div><h2>Who it helps</h2><p>{study.audience}</p></div><div><h2>The problem</h2><p>{study.problem}</p></div><div><h2>What Zeptaz built</h2><p>{study.solution}</p></div></div></div></section>
+    <section id="demo" className="section-dark case-demo-section" data-nav="dark"><div className="section-shell"><div className="case-section-heading"><div><span className="eyebrow text-crimson">Try it yourself</span><h2 className="heading-lg">{study.question}</h2></div><p>Follow one example in six short steps. Each screen shows what happens next; supporting details are available at the end.</p></div><PortfolioDemo study={study}/></div></section>
+    <section className="section-light case-features-section" data-nav="light"><div className="section-shell"><span className="eyebrow text-crimson">Inside the system</span><h2 className="heading-lg">What keeps this workflow on track.</h2><div className="case-feature-grid">{study.features.map((f,i)=><article key={f.title}><span className="mono-meta">{String(i+1).padStart(2,'0')}</span><h3>{f.title}</h3><p>{f.description}</p></article>)}</div></div></section>
+    <section className="section-dark case-tech-section" data-nav="dark"><div className="section-shell"><details className="case-tech-details"><summary>Under the hood <span>Underlying project stack and demo scope</span></summary><div className="case-tech-grid"><div><h3>Underlying project stack</h3><div className="case-tech-tags">{study.technology.map(t=><span key={t}>{t}</span>)}</div><h3>Integration architecture</h3><p>These connections belong to the underlying project architecture. Their effects are simulated here.</p><div className="case-tech-tags">{study.integrations.map(t=><span key={t}>{t}</span>)}</div></div><aside><h3>What this demo runs</h3><p>A fixed browser-local walkthrough with prepared data, explicit approvals and read-only supporting details. No production services are connected.</p><p>{study.implementationNote}</p>{study.serviceLinks.map(l=><Link key={l.href} href={l.href}>{l.label} <ArrowRight size={16}/></Link>)}</aside></div></details></div></section>
+    <section className="section-light next-case-section" data-nav="light"><div className="section-shell"><span className="mono-meta">Explore another workflow</span><Link href={`/work/${next.slug}`}><h2>{next.shortTitle}</h2><ArrowRight size={28}/></Link></div></section>
+  </article><CtaBand title={study.cta} lead="Bring us your current tools and the point where work gets stuck. We’ll map a practical first step." primary={{label:study.cta,href:`/contact?project=${study.slug}`}}/></>;
 }

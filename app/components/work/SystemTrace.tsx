@@ -1,12 +1,12 @@
 import { ArrowRight, Check, LockKeyhole } from 'lucide-react';
 
 const TRACE = [
-  { label: 'Input', detail: 'Form, message, brief, source' },
-  { label: 'Validate', detail: 'Fields, evidence, state' },
-  { label: 'Assist', detail: 'Draft, classify, summarize' },
-  { label: 'Approve', detail: 'Named human checkpoint', approval: true },
-  { label: 'Act', detail: 'Route, schedule, hand off' },
-  { label: 'Audit', detail: 'Result, exception, owner' },
+  { label: 'Receive', detail: 'A question, request or brief' },
+  { label: 'Check', detail: 'Confirm the available details' },
+  { label: 'Prepare', detail: 'Create a draft or proposed action' },
+  { label: 'Approve', detail: 'A person reviews the next action', approval: true },
+  { label: 'Act', detail: 'Assign, schedule or prepare the work' },
+  { label: 'Review', detail: 'See the result and who acts next' },
 ];
 
 export default function SystemTrace() {

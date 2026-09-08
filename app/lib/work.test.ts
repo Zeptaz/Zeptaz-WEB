@@ -10,7 +10,9 @@ test('publishes exactly four distinct portfolio projects', () => {
 
 test('each project has a complete guided demo and honest implementation note', () => {
   for (const study of CASE_STUDIES) {
-    assert.ok(study.demoSteps.length >= 6, `${study.slug} needs at least six demo steps`);
+    assert.equal(study.demoSteps.length, 6, `${study.slug} must keep the fixed six-screen flow`);
+    assert.equal(study.demoSteps.at(-1)?.action, null, `${study.slug} result screen must not advance`);
+    assert.ok(study.demoSteps.slice(0, -1).every((step) => step.action), `${study.slug} needs one action per working screen`);
     assert.ok(study.features.length >= 4, `${study.slug} needs enough feature detail`);
     assert.match(study.implementationNote, /simulat|synthetic|working/i);
     assert.ok(study.workflow.length >= 5);

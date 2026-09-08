@@ -1,87 +1,22 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowDown, ArrowRight, CheckCircle2 } from 'lucide-react';
-import PageHero from '@/components/ui/PageHero';
+import { ArrowDown, ArrowRight } from 'lucide-react';
 import CtaBand from '@/components/ui/CtaBand';
 import WorkCard from '@/components/work/WorkCard';
 import SystemTrace from '@/components/work/SystemTrace';
 import { CASE_STUDIES } from '@/lib/work';
-
 export const metadata: Metadata = {
   title: 'Selected Work — Zeptaz',
-  description: 'Explore four interactive Zeptaz systems spanning enquiry operations, governed campaigns, controlled AI workstations, and media intelligence.',
+  description: 'Explore four interactive systems for enquiries, campaign review, supervised AI work and evidence-based reporting.',
   alternates: { canonical: '/work' },
-  openGraph: {
-    title: 'Working systems. Shown end to end. — Zeptaz',
-    description: 'Interactive demonstrations of reliable, operator-controlled workflow automation.',
-    url: '/work',
-  },
+  openGraph: { title: 'See our work in action — Zeptaz', description: 'Four interactive workflow demonstrations with fictional data.', url: '/work' },
 };
-
 export default function WorkPage() {
-  return (
-    <>
-      <PageHero
-        eyebrow="Selected systems"
-        title={<>Working systems.<br /><span className="text-crimson">Shown end to end.</span></>}
-        lead="See how Zeptaz turns intake, decisions, approvals, handoffs, and reporting into reliable operator-controlled workflows."
-        index="01 — 04"
-        aside={
-          <div className="work-hero-aside">
-            <span><CheckCircle2 size={14} /> Four guided demonstrations</span>
-            <span><CheckCircle2 size={14} /> Synthetic, privacy-safe data</span>
-            <span><CheckCircle2 size={14} /> Human checkpoints visible</span>
-            <a href="#featured"><ArrowDown size={14} /> Explore the systems</a>
-          </div>
-        }
-      />
-
-      <section id="featured" data-nav="light" className="section-light work-index-section">
-        <div className="section-shell">
-          <div className="work-section-heading">
-            <div><span className="eyebrow text-crimson">Featured work</span><h2 className="heading-xl">Four workflows.<br />Four operational problems.</h2></div>
-            <p>Each case study starts with a real workflow pattern and ends with an interactive, resettable demonstration. No invented customer results. No autonomous-AI theatre.</p>
-          </div>
-          <div className="work-featured-grid">
-            {CASE_STUDIES.slice(0, 3).map((study) => <WorkCard key={study.slug} study={study} featured />)}
-          </div>
-          <div className="work-fourth-card"><WorkCard study={CASE_STUDIES[3]} /></div>
-        </div>
-      </section>
-
-      <section data-nav="dark" className="section-dark work-engine-section grid-lines">
-        <div className="section-shell">
-          <div className="work-engine-copy">
-            <span className="eyebrow text-crimson">The shared operating model</span>
-            <h2 className="heading-xl">AI assists inside the workflow.<br />It does not own the workflow.</h2>
-            <p>Different systems, one delivery principle: inputs are checked, automated decisions stay observable, sensitive outputs wait for a person, and every action closes with evidence.</p>
-          </div>
-          <SystemTrace />
-        </div>
-      </section>
-
-      <section data-nav="light" className="section-light work-service-map">
-        <div className="section-shell">
-          <span className="eyebrow text-crimson">Connected to Zeptaz services</span>
-          <div className="service-map-grid">
-            {CASE_STUDIES.map((study) => (
-              <Link key={study.slug} href={`/work/${study.slug}`}>
-                <span>{study.number}</span>
-                <div><h3>{study.shortTitle}</h3><p>{study.services.join(' · ')}</p></div>
-                <ArrowRight size={18} />
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <CtaBand
-        eyebrow="Bring us the workflow"
-        title="Have a similar operational problem?"
-        lead="Show us where work enters, where it gets stuck, and who needs control. We’ll map the smallest reliable system around it."
-        primary={{ label: 'Book a Workflow Fit Call', href: '/contact' }}
-        secondary={{ label: 'Explore our process', href: '/process' }}
-      />
-    </>
-  );
+  return <>
+    <section className="section-dark work-hero" data-nav="dark"><div className="section-shell"><span className="eyebrow text-crimson">Selected work / 01 — 04</span><div className="work-hero-grid"><h1>See our work<br /><span>in action.</span></h1><div><p>Explore four systems for handling enquiries, reviewing campaigns, supervising AI work, and turning sources into useful reports.</p><div className="work-hero-actions"><a className="btn btn-primary" href="#featured">Explore the case studies <ArrowDown size={16}/></a><Link href="/contact">Book a workflow fit call <ArrowRight size={16}/></Link></div><small>Four practical examples · Guided demos inside · No sign-up</small></div></div></div></section>
+    <section id="featured" className="section-light work-index-section" data-nav="light"><div className="section-shell"><div className="work-section-heading"><div><span className="eyebrow text-crimson">Four practical systems</span><h2 className="heading-xl">Choose a case study<br />to explore.</h2></div><p>Understand the problem and solution first, then follow the guided demo inside each case study.</p></div><div className="work-featured-grid">{CASE_STUDIES.map(study => <WorkCard key={study.slug} study={study}/>)}</div></div></section>
+    <section className="section-dark work-engine-section" data-nav="dark"><div className="section-shell"><div className="work-section-heading"><div><span className="eyebrow text-crimson">The shared operating model</span><h2 className="heading-xl">A clear handoff<br />at every step.</h2></div><p>See what the system checks, what it prepares, and where a person approves the next action.</p></div><SystemTrace/></div></section>
+    <section className="section-light work-service-map" data-nav="light"><div className="section-shell"><span className="eyebrow text-crimson">Connected to your operations</span><div className="service-map-grid">{CASE_STUDIES.map(study => <article key={study.slug}><h3>{study.shortTitle}</h3>{study.serviceLinks.map(link => <Link key={link.href} href={link.href}>{link.label}<ArrowRight size={16}/></Link>)}</article>)}</div></div></section>
+    <CtaBand eyebrow="Bring us the workflow" title="Where does work get stuck in your team?" lead="Show us the tools, the handoffs, and who needs control. We’ll map the smallest reliable system around them." secondary={{ label:'Explore our process',href:'/process' }}/>
+  </>;
 }

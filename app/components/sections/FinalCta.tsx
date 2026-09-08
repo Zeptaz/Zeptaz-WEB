@@ -1,8 +1,9 @@
 'use client';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import emailjs from '@emailjs/browser';
 import { ArrowRight, Check, LoaderCircle } from 'lucide-react';
 import { SITE } from '@/lib/constants';
+import { isWorkSlug, CASE_STUDY_BY_SLUG } from '@/lib/work';
 import Eyebrow from '@/components/ui/Eyebrow';
 import Reveal from '@/components/ui/Reveal';
 import Drift from '@/components/ui/Drift';
@@ -19,6 +20,11 @@ type Status = 'idle' | 'sending' | 'sent' | 'error' | 'mailto';
 export default function FinalCta() {
   const formRef = useRef<HTMLFormElement>(null);
   const [status, setStatus] = useState<Status>('idle');
+  const [project, setProject] = useState('');
+  useEffect(() => {
+    const slug = new URLSearchParams(window.location.search).get('project');
+    if (slug && isWorkSlug(slug)) setProject(CASE_STUDY_BY_SLUG[slug].shortTitle);
+  }, []);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -83,13 +89,15 @@ export default function FinalCta() {
               </div>
             ) : (
               <form ref={formRef} className="space-y-4" onSubmit={onSubmit}>
+                {project && <p className="text-sm text-text-secondary">Interested in: {project}</p>}
                 <Field label="Name" name="name" placeholder="Your name" required />
                 <Field label="Work email" name="email" type="email" placeholder="you@company.com" required />
                 <Field label="ATS / CRM you use" name="ats" placeholder="Bullhorn, HubSpot, …" />
                 <div>
-                  <label htmlFor="message" className="mono-meta mb-2 block text-text-muted">Where do inquiries get stuck?</label>
+                  <label htmlFor="message" className="mono-meta mb-2 block text-text-muted">Where does work get stuck?</label>
                   <textarea
-                    id="message" name="message" rows={3}
+                    id="message" name="message" rows={3} key={project}
+                    defaultValue={project ? `I would like to discuss a workflow similar to ${project}. ` : undefined}
                     className="w-full resize-none border border-border-strong bg-bg-primary px-3.5 py-3 text-sm text-text-primary placeholder:text-text-faint focus:border-crimson focus:outline-none"
                     placeholder="A sentence or two is plenty."
                   />

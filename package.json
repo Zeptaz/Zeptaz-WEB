@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test:voice": "node --experimental-strip-types --test app/lib/voicePlayback.test.ts",
-    "test:work": "node --experimental-strip-types --test app/lib/work.test.ts"
+    "test:work": "node --experimental-strip-types --test app/lib/work.test.ts app/lib/demo-state.test.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",

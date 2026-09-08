@@ -38,6 +38,7 @@ export default function PageTransition() {
       if (!href) return;
       const url = new URL(href, window.location.href);
       if (url.origin !== window.location.origin) return;
+      if (url.pathname.startsWith('/work')) return;
       // same page (incl. #hash scrolls) - let Link / lenis handle it
       if (url.pathname === window.location.pathname) return;
 
