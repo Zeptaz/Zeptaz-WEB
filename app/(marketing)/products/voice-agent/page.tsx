@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import CtaBand from '@/components/ui/CtaBand';
 import VoiceHero from '@/components/sections/voice/VoiceHero';
 import VoiceWorkflow from '@/components/sections/voice/VoiceWorkflow';
-import VoiceDemo from '@/components/sections/voice/VoiceDemo';
+import VoiceDemo from '@/components/sections/voice/LazyVoiceDemo';
 import VoiceControl from '@/components/sections/voice/VoiceControl';
 import VoiceFaq from '@/components/sections/voice/VoiceFaq';
 import VoicePilot from '@/components/sections/voice/VoicePilot';
