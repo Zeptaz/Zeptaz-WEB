@@ -8,6 +8,9 @@ const API_BASE = (process.env.NEXT_PUBLIC_VOICE_API_URL ?? '').replace(/\/+$/, '
 export const VOICE_DEMO_CONFIGURED = API_BASE.length > 0;
 
 const CAPTURE_RATE = 16000;
+const DEFAULT_PACKET_DURATION_MS = 128;
+const MIN_PACKET_DURATION_MS = 20;
+const MAX_PACKET_DURATION_MS = 250;
 const READY_TIMEOUT_MS = 10_000;
 const HEARTBEAT_MS = 15_000;
 
@@ -39,6 +42,12 @@ type DemoGrant = {
   expires_at: number;
   max_duration_seconds: number;
   features: { full_duplex: boolean };
+  input_format?: {
+    encoding: string;
+    sample_rate: number;
+    channels: number;
+    packet_duration_ms?: number;
+  };
 };
 
 type ServerEvent = {
@@ -91,6 +100,17 @@ function validateGrant(
   return grant as DemoGrant;
 }
 
+function packetDurationFromGrant(grant: DemoGrant): number {
+  const duration = grant.input_format?.packet_duration_ms;
+  if (
+    typeof duration !== 'number' ||
+    !Number.isInteger(duration) ||
+    duration < MIN_PACKET_DURATION_MS ||
+    duration > MAX_PACKET_DURATION_MS
+  ) return DEFAULT_PACKET_DURATION_MS;
+  return duration;
+}
+
 export function useVoiceSession() {
   const [state, setState] = useState<VoiceState>(VOICE_DEMO_CONFIGURED ? 'idle' : 'unconfigured');
   const [status, setStatus] = useState(VOICE_DEMO_CONFIGURED ? STATUS.idle : STATUS.unconfigured);
@@ -108,6 +128,7 @@ export function useVoiceSession() {
   const fullDuplexRef = useRef(false);
   const startingRef = useRef(false);
   const openingRef = useRef(false);
+  const packetDurationMsRef = useRef(DEFAULT_PACKET_DURATION_MS);
   const readyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sessionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const heartbeatTimer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -205,6 +226,7 @@ export function useVoiceSession() {
         numberOfInputs: 1,
         numberOfOutputs: 1,
         outputChannelCount: [1],
+        processorOptions: { chunkSamples: Math.round(CAPTURE_RATE * packetDurationMsRef.current / 1000) },
       });
       node.port.onmessage = (event) => upload(event.data as ArrayBuffer);
       analyser.connect(node);
@@ -288,6 +310,7 @@ export function useVoiceSession() {
     ws.binaryType = 'arraybuffer';
     wsRef.current = ws;
     fullDuplexRef.current = Boolean(grant.features?.full_duplex);
+    packetDurationMsRef.current = packetDurationFromGrant(grant);
     sessionTimer.current = setTimeout(
       () => teardown('ended', 'The demo time limit was reached. Tap the microphone to start again.'),
       grant.max_duration_seconds * 1000 + 1_000,
