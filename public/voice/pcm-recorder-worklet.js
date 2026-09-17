@@ -7,6 +7,8 @@
  * forwards them over the WebSocket untouched.
  */
 const DEFAULT_CHUNK_SAMPLES = 2048; // 128 ms at 16 kHz
+const HYBRID_VAD_THRESHOLD = 0.014;
+const HYBRID_VAD_SILENCE_MS = 550;
 
 class PcmRecorder extends AudioWorkletProcessor {
   constructor(options) {
@@ -19,6 +21,9 @@ class PcmRecorder extends AudioWorkletProcessor {
       : DEFAULT_CHUNK_SAMPLES;
     this.buffer = new Int16Array(this.chunkSamples);
     this.filled = 0;
+    this.hybridVad = options?.processorOptions?.hybridVad === true;
+    this.speechActive = false;
+    this.silentSamples = 0;
     this.port.onmessage = (event) => {
       if (event.data?.type === 'flush') this.flush();
     };
@@ -31,9 +36,29 @@ class PcmRecorder extends AudioWorkletProcessor {
     this.filled = 0;
   }
 
+  trackHybridVad(channel) {
+    if (!this.hybridVad) return;
+    let energy = 0;
+    for (let i = 0; i < channel.length; i++) energy += channel[i] * channel[i];
+    const speaking = Math.sqrt(energy / channel.length) >= HYBRID_VAD_THRESHOLD;
+    if (speaking) {
+      this.speechActive = true;
+      this.silentSamples = 0;
+      return;
+    }
+    if (!this.speechActive) return;
+    this.silentSamples += channel.length;
+    if (this.silentSamples >= sampleRate * HYBRID_VAD_SILENCE_MS / 1000) {
+      this.speechActive = false;
+      this.silentSamples = 0;
+      this.port.postMessage({ type: 'speech_end' });
+    }
+  }
+
   process(inputs) {
     const channel = inputs[0] && inputs[0][0];
     if (!channel) return true;
+    this.trackHybridVad(channel);
 
     for (let i = 0; i < channel.length; i++) {
       const s = Math.max(-1, Math.min(1, channel[i]));

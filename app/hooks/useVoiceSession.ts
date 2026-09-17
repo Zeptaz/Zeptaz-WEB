@@ -41,7 +41,7 @@ type DemoGrant = {
   token: string;
   expires_at: number;
   max_duration_seconds: number;
-  features: { full_duplex: boolean };
+  features: { full_duplex: boolean; hybrid_vad?: boolean };
   input_format?: {
     encoding: string;
     sample_rate: number;
@@ -126,6 +126,7 @@ export function useVoiceSession() {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const playbackRef = useRef<VoicePlaybackController | null>(null);
   const fullDuplexRef = useRef(false);
+  const hybridVadRef = useRef(false);
   const startingRef = useRef(false);
   const openingRef = useRef(false);
   const packetDurationMsRef = useRef(DEFAULT_PACKET_DURATION_MS);
@@ -226,9 +227,18 @@ export function useVoiceSession() {
         numberOfInputs: 1,
         numberOfOutputs: 1,
         outputChannelCount: [1],
-        processorOptions: { chunkSamples: Math.round(CAPTURE_RATE * packetDurationMsRef.current / 1000) },
+        processorOptions: {
+          chunkSamples: Math.round(CAPTURE_RATE * packetDurationMsRef.current / 1000),
+          hybridVad: hybridVadRef.current,
+        },
       });
-      node.port.onmessage = (event) => upload(event.data as ArrayBuffer);
+      node.port.onmessage = (event) => {
+        if (event.data instanceof ArrayBuffer) upload(event.data);
+        else if (event.data?.type === 'speech_end' && hybridVadRef.current) {
+          const ws = wsRef.current;
+          if (ws?.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: 'audio_stream_end' }));
+        }
+      };
       analyser.connect(node);
       node.connect(sink);
       workletRef.current = node;
@@ -310,6 +320,7 @@ export function useVoiceSession() {
     ws.binaryType = 'arraybuffer';
     wsRef.current = ws;
     fullDuplexRef.current = Boolean(grant.features?.full_duplex);
+    hybridVadRef.current = Boolean(grant.features?.hybrid_vad);
     packetDurationMsRef.current = packetDurationFromGrant(grant);
     sessionTimer.current = setTimeout(
       () => teardown('ended', 'The demo time limit was reached. Tap the microphone to start again.'),
