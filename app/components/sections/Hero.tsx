@@ -22,26 +22,14 @@ export default function Hero() {
       const lines = el.querySelectorAll<HTMLElement>('[data-line] > span');
       const fades = el.querySelectorAll<HTMLElement>('[data-fade]');
 
-      // On touch the headline ships visible. The hold-until-scroll reveal is a
-      // desktop conceit; on a phone it meant landing on the site and seeing an
-      // animated canvas with no words on it at all.
-      const touch = window.matchMedia('(pointer: coarse)').matches;
-
-      if (!touch) {
-        // Hidden on entry - only the code tunnel shows until the visitor acts.
-        gsap.set(lines, { yPercent: 115 });
-        gsap.set(fades, { opacity: 0, y: 28 });
-      }
-
-      // Reveal plays ONCE the first time the visitor scrolls (see onUpdate below)
-      // and never reverses - it's a separate paused timeline, not scrub-linked, so
-      // scrolling back up keeps the text in place. Only the pull below reverses.
-      const revealTl = gsap.timeline({ paused: true });
-      revealTl
-        .to(lines, { yPercent: 0, duration: 0.5, ease: 'power4.out', stagger: 0.06 }, 0)
-        .to(fades, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out', stagger: 0.06 }, 0.1);
-      let revealed = touch;
+      // Headline plays in on load - never held back waiting for a scroll.
+      gsap.set(lines, { yPercent: 115 });
+      gsap.set(fades, { opacity: 0, y: 28 });
+      gsap.timeline({ delay: 0.15 })
+        .to(lines, { yPercent: 0, duration: 0.7, ease: 'power4.out', stagger: 0.08 }, 0)
+        .to(fades, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.08 }, 0.15);
       const hint = el.querySelector<HTMLElement>('[data-hint]');
+      let hintGone = false;
 
       // Pin + hand-off - still fully scrubbed/reversible.
       const tl = gsap.timeline({
@@ -53,10 +41,9 @@ export default function Hero() {
           pin: true,
           pinSpacing: true,
           onUpdate: (self) => {
-            // first nudge of scroll → play the reveal once; it then stays put
-            if (!revealed && self.progress > 0.02) {
-              revealed = true;
-              revealTl.play();
+            // first nudge of scroll → retire the scroll hint
+            if (!hintGone && self.progress > 0.02) {
+              hintGone = true;
               if (hint) gsap.to(hint, { opacity: 0, duration: 0.4, overwrite: true });
             }
           },
@@ -71,21 +58,10 @@ export default function Hero() {
     return () => { ctx.revert(); ScrollTrigger.refresh(); };
   }, []);
 
-  // Click anywhere on the hero (while at the top, ignoring the CTA) nudges the
-  // scroll forward so the text reveals via the same scrub path.
-  const handleReveal = (e: React.MouseEvent) => {
-    if (prefersReducedMotion()) return;
-    if ((e.target as HTMLElement).closest('a, button')) return;
-    if (window.scrollY > window.innerHeight * 0.2) return;
-    const lenis = (window as unknown as { __lenis?: { scrollTo: (t: number, o?: object) => void } }).__lenis;
-    lenis?.scrollTo(window.innerHeight * 0.62, { duration: 1.1 });
-  };
-
   return (
     <section
       id="top"
       ref={root}
-      onClick={handleReveal}
       className="section-dark relative flex min-h-[100svh] items-center justify-center overflow-hidden"
     >
       {/* immersive background */}
@@ -115,8 +91,8 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* scroll affordance - the hero is pinned and only reveals on the first
-          nudge, so tell the visitor the page moves; fades once they do */}
+      {/* scroll affordance - the hero is pinned, so tell the visitor the page
+          moves; fades once they do */}
       {!reduced && (
         <div
           data-hint

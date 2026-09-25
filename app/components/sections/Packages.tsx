@@ -1,5 +1,6 @@
 'use client';
-import { Check } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowRight, Check } from 'lucide-react';
 import { PACKAGES, PACKAGES_NOTE } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import Eyebrow from '@/components/ui/Eyebrow';
@@ -33,10 +34,23 @@ export default function Packages() {
 
               <p className="mt-4 text-sm text-text-secondary">{p.tagline}</p>
 
-              <div className="mt-6 flex items-end gap-1">
-                <span className="display-stat text-5xl font-bold">{p.price}</span>
+              {/* prices stay blurred until we publish them - the overlay points
+                  visitors to a conversation instead */}
+              <div className="relative mt-6">
+                <div aria-hidden className="pointer-events-none select-none">
+                  <div className="flex items-end gap-1">
+                    <span className="display-stat text-5xl font-bold blur-md">{p.price}</span>
+                  </div>
+                  <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.1em] text-text-muted blur-[3px]">{p.priceNote}</div>
+                </div>
+                <Link
+                  href="/contact"
+                  className="absolute inset-0 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-text-primary transition-colors hover:text-crimson"
+                >
+                  Contact us to discuss pricing
+                  <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.5} />
+                </Link>
               </div>
-              <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.1em] text-text-muted">{p.priceNote}</div>
 
               <a
                 href="#contact"
